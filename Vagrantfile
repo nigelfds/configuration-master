@@ -9,6 +9,7 @@ Vagrant::Config.run do |config|
     ]
     configuration.vm.host_name = "configuration-master"
     # configuration.vm.network :hostonly, "33.33.33.15"
+    configuration.vm.forward_port 8153, 8153
     configuration.vm.share_folder ".", "/home/vagrant/configuration-master", "."
     configuration.vm.provision :shell, :path => "lib/provision.sh"
   end
