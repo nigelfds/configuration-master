@@ -53,23 +53,4 @@ namespace :aws do
       puts "couldn't find stack. Nothing to do"
     end
   end
-
-  task :upload_bootstrap_files => [:package] do
-    s3 = AWS::S3.new
-    bucket_name = "#{STACK_NAME}-bootstrap-bucket"
-    bucket = s3.buckets[bucket_name]
-    unless bucket.exists?
-      puts "creating S3 bucket".cyan
-      bucket = s3.buckets.create(bucket_name)
-    end
-    puts "uploading bootstrap package...".cyan
-    bucket.objects[BOOTSTRAP_FILE].write(File.read("#{BUILD_DIR}/#{BOOTSTRAP_FILE}"))
-  end
-
-  task :package => [:clean, BUILD_DIR] do
-    mkdir_p "#{BUILD_DIR}/package"
-    cp_r "puppet", "#{BUILD_DIR}/package/puppet"
-    puts "packaging boostrap files in #{BOOTSTRAP_FILE}"
-    %x[cd #{BUILD_DIR}/package; tar -zcf ../#{BOOTSTRAP_FILE} *]
-  end
 end

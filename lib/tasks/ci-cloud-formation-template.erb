@@ -21,7 +21,23 @@
 
   "Resources" : {
     "Ec2Instance" : {
-      "Type" : "AWS::EC2::Instance",
+      "Type" : "AWS::EC2::Instance",      
+      "Metadata" : { 
+        "AWS::CloudFormation::Init" : { 
+          "config" : { 
+            "packages" : { 
+              "rpm" : {
+                "go-server" : "http://download01.thoughtworks.com/go/12.2.1/ga/go-server-12.2.1-15143.noarch.rpm",
+                "go-agent" : "http://download01.thoughtworks.com/go/12.2.1/ga/go-agent-12.2.1-15143.noarch.rpm",
+                "jdk" : "http://dl.dropbox.com/u/58853148/jdk-7u3-linux-i586.rpm"
+              },
+              "yum" : {
+               "git" : []
+              }
+            } 
+          }
+        }
+      },            
       "Properties" : {
         "SecurityGroups" : [ { "Ref" : "InstanceSecurityGroup" } ],
         "KeyName" : { "Ref" : "KeyName" },
