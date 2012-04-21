@@ -1,0 +1,2 @@
+rvm_user_install_flag=1
+rvm use --create ruby-1.9.2-p290@configuration-master
