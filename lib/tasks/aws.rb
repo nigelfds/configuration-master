@@ -32,6 +32,11 @@ namespace :aws do
                                             ERB.new(template_body).result(binding),
                                             :parameters => { "KeyName" => SETTINGS["aws_ssh_key_name"] })
       sleep 1 until stack.status == "CREATE_COMPLETE"
+      while ((status = stack.status) != "CREATE_COMPLETE")
+        if status == "ROLLBACK_COMPLETE"
+          raise "error creating stack!".red
+        end
+      end
       puts "the CI environment has been provisioned successfully".white
     else
       puts "the CI environment exists already. Nothing to do"
