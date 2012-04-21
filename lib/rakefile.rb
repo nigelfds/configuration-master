@@ -7,4 +7,5 @@ require 'tasks/aws'
 
 CLEAN.include(BUILD_DIR)
 
+task(:default) {|t| puts "WIP !! to be defined"}
 
