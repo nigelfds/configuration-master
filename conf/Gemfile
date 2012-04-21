@@ -1,4 +1,9 @@
 source :rubygems
+
 gem "rake"
 gem "aws-sdk"
 gem "colorize"
+
+group :development do 
+  gem "vagrant"
+end
