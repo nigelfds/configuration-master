@@ -11,11 +11,11 @@ namespace :aws do
     exit
   end
 
-  AWS.config(:access_key_id     => SETTINGS["aws_access_key"],
-             :secret_access_key => SETTINGS["aws_secret_access_key"])
   TEMPLATES_DIR = "#{File.dirname(__FILE__)}"
   BOOTSTRAP_FILE = "ci-bootstrap.tar.gz"
   STACK_NAME = "twitter-stream-ci"
+  AWS.config(:access_key_id     => SETTINGS["aws_access_key"],
+             :secret_access_key => SETTINGS["aws_secret_access_key"])
 
   directory BUILD_DIR
 
@@ -41,6 +41,8 @@ namespace :aws do
     else
       puts "the CI environment exists already. Nothing to do"
     end
+    instance = stack.outputs.find { |output| output.key == "PublicIP" }
+    puts "your CI server's address is #{instance.value}"
   end
 
   desc "stops the CI environment"
