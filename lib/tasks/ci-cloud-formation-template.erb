@@ -21,32 +21,12 @@
 
   "Resources" : {
     "Ec2Instance" : {
-      "Type" : "AWS::EC2::Instance",      
-      "Metadata" : { 
-        "AWS::CloudFormation::Init" : { 
-          "config" : { 
-            "packages" : { 
-              "rpm" : {
-                "go-server" : "http://download01.thoughtworks.com/go/12.2.1/ga/go-server-12.2.1-15143.noarch.rpm",
-                "go-agent" : "http://download01.thoughtworks.com/go/12.2.1/ga/go-agent-12.2.1-15143.noarch.rpm",
-                "jdk" : "http://dl.dropbox.com/u/58853148/jdk-7u3-linux-i586.rpm"
-              },
-              "yum" : {
-               "git" : []
-              }
-            } 
-          }
-        }
-      },            
+      "Type" : "AWS::EC2::Instance",
       "Properties" : {
         "SecurityGroups" : [ { "Ref" : "InstanceSecurityGroup" } ],
         "KeyName" : { "Ref" : "KeyName" },
         "ImageId" : { "Fn::FindInMap" : [ "RegionMap", { "Ref" : "AWS::Region" }, "AMI" ]},
-        "UserData": {
-          "Fn::Base64": {
-            "Fn::Join": [ "\n", [ <%= boot_script.to_json  %>, "admin_server: self", "role: admin"]]
-          }
-        }
+        "UserData": { "Fn::Base64": { "Fn::Join": [ "\n", [<%= boot_script.to_json  %>] ] } }
       }
     },
 
