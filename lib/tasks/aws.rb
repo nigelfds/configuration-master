@@ -29,7 +29,7 @@ namespace :aws do
     unless stack.exists?
       puts "creating aws stack, this might take a while... ".white
       stack = cloud_formation.stacks.create(STACK_NAME,
-                                            ERB.new(template_body).result(binding),
+                                            JSON.parse(ERB.new(template_body).result(binding)),
                                             :parameters => { "KeyName" => SETTINGS["aws_ssh_key_name"] })
       sleep 1 until stack.status == "CREATE_COMPLETE"
       while ((status = stack.status) != "CREATE_COMPLETE")
