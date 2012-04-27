@@ -1,16 +1,15 @@
 Vagrant::Config.run do |config|
   config.vm.define :configuration_master do |configuration|
-    configuration.vm.box = "centos57_32Netcool"
-    configuration.vm.box_url = 'http://artifactory.nbnco.net.au/netcool/VM/centos57_32Netcool.box'
+    configuration.vm.box = "centos57_86_64"
+    configuration.vm.box_url = 'http://dl.dropbox.com/u/8072848/centos-5.7-x86_64.box'
     configuration.vm.customize [
       "modifyvm", :id,
       "--name", "configuration-master",
       "--memory", "1024"
     ]
     configuration.vm.host_name = "configuration-master"
-    # configuration.vm.network :hostonly, "33.33.33.15"
     configuration.vm.forward_port 8153, 8153
     configuration.vm.share_folder ".", "/home/vagrant/configuration-master", "."
-    configuration.vm.provision :shell, :path => "lib/provision.sh"
+    configuration.vm.provision :shell, :path => "scripts/boot_script.erb"
   end
 end
