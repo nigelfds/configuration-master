@@ -5,5 +5,5 @@ gem "aws-sdk"
 gem "colorize"
 
 group :development do 
-  gem "vagrant"
+  gem "vagrant", "1.0.1"
 end
