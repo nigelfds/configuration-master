@@ -12,5 +12,5 @@ yum install -y git
 rpm -ivh http://dl.dropbox.com/u/58853148/jdk-7u3-linux-i586.rpm
 rpm -ivh http://download01.thoughtworks.com/go/12.2.1/ga/go-server-12.2.1-15143.noarch.rpm
 rpm -ivh http://download01.thoughtworks.com/go/12.2.1/ga/go-agent-12.2.1-15143.noarch.rpm
-wget -O /etc/go/cruise-config.xml https://github.com/nigelfds/configuration-master/blob/master/templates/cruise-config.xml.erb
+wget -O /etc/go/cruise-config.xml https://raw.github.com/nigelfds/configuration-master/master/templates/cruise-config.xml.erb
 su go -c '/etc/init.d/go-agent start'
