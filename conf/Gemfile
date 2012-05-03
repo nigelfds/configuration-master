@@ -3,6 +3,7 @@ source :rubygems
 gem "rake"
 gem "aws-sdk"
 gem "colorize"
+gem "rspec"
 
 group :development do 
   gem "vagrant", "1.0.1"
