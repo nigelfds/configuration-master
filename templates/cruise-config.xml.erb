@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<cruise xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="cruise-config.xsd" schemaVersion="53">
+  <pipelines group="defaultGroup">
+    <pipeline name="Aws_Twitter_Feed_Project">
+      <materials>
+        <git url="https://github.com/nigelfds/aws-twitter-feed" />
+      </materials>
+      <stage name="CommitBuild">
+        <jobs>
+          <job name="package">
+            <tasks>
+              <exec command="./go" args="package" />
+            </tasks>
+          </job>
+        </jobs>
+      </stage>
+    </pipeline>
+  </pipelines>
+</cruise>
