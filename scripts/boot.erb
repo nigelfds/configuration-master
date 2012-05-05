@@ -1,0 +1,11 @@
+#!/bin/bash
+
+curl <%= boot_package_url %> -o /tmp/boot.tar.gz
+
+yum install -y puppet
+mkdir /tmp/boot
+cd /tmp/boot
+tar zxf /tmp/boot.tar.gz
+cd /tmp/boot/puppet
+puppet apply --modulepath=modules <%= role %>.pp
+

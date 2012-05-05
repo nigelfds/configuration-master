@@ -1,3 +1,10 @@
+require "rubygems"
+require "erb"
+
+role = ENV["role"]
+boot_package_url = "file:///home/vagrant/configuration-master/build/boot.tar.gz"
+boot_script = ERB.new(File.read("scripts/boot.erb")).result(binding)
+
 Vagrant::Config.run do |configuration|
   configuration.vm.box = "centos57_86_64"
   configuration.vm.box_url = "http://dl.dropbox.com/u/8072848/centos-5.7-x86_64.box"
@@ -8,6 +15,6 @@ Vagrant::Config.run do |configuration|
   ]
   configuration.vm.host_name = "configuration-master"
   configuration.vm.forward_port 8153, 8153
-  configuration.vm.share_folder ".", "/home/vagrant/configuration-master", "."
-  configuration.vm.provision :shell, :path => "../scripts/boot.sh"
+  configuration.vm.share_folder "..", "/home/vagrant/configuration-master", ".."
+  configuration.vm.provision :shell, :inline => boot_script
 end

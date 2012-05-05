@@ -3,7 +3,8 @@ require "net/http"
 
 describe "Go server" do
   before :all do
-    ENV["BOOT_PACKAGE_URL"] = "file:///home/vagrant/configuration-master/build/puppet.tar.gz"
+    %x{./go clean package:puppet}
+    ENV["role"] = "go-server"
     VAGRANT.cli("up")
   end
 
