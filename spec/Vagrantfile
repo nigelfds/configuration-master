@@ -3,8 +3,8 @@ require "erb"
 
 role = ENV["role"]
 boot_package_url = "file:///home/vagrant/configuration-master/build/boot.tar.gz"
-#boot_script = ERB.new(File.read("scripts/boot.erb")).result(binding)
-boot_script = ""
+boot_script = ERB.new(File.read("scripts/boot.erb")).result(binding)
+
 Vagrant::Config.run do |configuration|
   configuration.vm.box = "centos57_86_64"
   configuration.vm.box_url = "http://dl.dropbox.com/u/8072848/centos-5.7-x86_64.box"

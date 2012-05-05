@@ -4,7 +4,7 @@ require "net/http"
 describe "Go server" do
   before :all do
     %x{./go clean package:puppet}
-    ENV["role"] = "go-server"
+    ENV["role"] = "buildserver"
     VAGRANT.cli("up")
   end
 
