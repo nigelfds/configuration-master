@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <cruise xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="cruise-config.xsd" schemaVersion="53">
-  <pipelines group="AwsTwitterFeedGroup">
-    <pipeline name="Aws_Twitter_Feed_Project" isLocked="true">
+  <pipelines group="AwsDevOpsGroup">
+    <pipeline name="AwsTwitterFeedProject" isLocked="true">
       <materials>
         <git url="https://github.com/nigelfds/aws-twitter-feed" />
       </materials>
@@ -18,9 +18,7 @@
         </jobs>
       </stage>
     </pipeline>
-  </pipelines>
-  <pipelines group="EnvironmentConfigurationGroup">
-		<pipeline name="Configuration_Master_Project" isLocked="true">
+		<pipeline name="ConfigurationMasterProject" isLocked="true">
 			<materials>
 				<git url="https://github.com/nigelfds/configuration-master" />
 			</materials>
