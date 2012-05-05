@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<cruise xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="cruise-config.xsd" schemaVersion="53">
+  <pipelines group="defaultGroup">
+    <pipeline name="Aws_Twitter_Feed_Project" isLocked="true">
+      <materials>
+        <git url="https://github.com/nigelfds/aws-twitter-feed" />
+      </materials>
+      <stage name="CommitBuild">
+        <jobs>
+          <job name="package">
+            <tasks>
+              <exec command="./go" args="package" />
+            </tasks>
+            <artifacts>
+              <artifact src="aws-twitter-feed-0.0.1.noarch.rpm" dest="rpms" />
+            </artifacts>
+          </job>
+        </jobs>
+      </stage>
+    </pipeline>
+  </pipelines>
+</cruise>
+
