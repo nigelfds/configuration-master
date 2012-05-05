@@ -1,7 +1,7 @@
 #!/bin/bash -e
 
-BUNDLE_GEMFILE="$(pwd)/conf/Gemfile"
-RAKEFILE="$(pwd)/lib/rakefile.rb"
+export BUNDLE_GEMFILE="$(pwd)/conf/Gemfile"
+export RAKEFILE="$(pwd)/lib/rakefile.rb"
 
 # ensure RVM is installed
 if [ ! -d "$HOME/.rvm" ]; then
@@ -18,5 +18,5 @@ source .rvmrc > /dev/null
 gem list | grep bundler  || gem install bundler --version 1.0.21 --no-rdoc --no-ri
 bundle check || bundle install
 
-bundle exec rake $@
+bundle exec rake -f $RAKEFILE $@
 

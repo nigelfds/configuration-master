@@ -6,8 +6,10 @@ yum install -y newrelic-sysmond
 nrsysmond-config --set license_key=33bc054596d2e8c21ad5aa0afe4d570338bd7d63
 /etc/init.d/newrelic-sysmond start
 
+#Specific Pipeline dependencies
 yum install -y rpm-build
 yum install -y git
+yum install -y ruby-devel openssl-devel make gcc libxml2-devel libxslt-devel
 
 rpm -ivh http://dl.dropbox.com/u/58853148/jdk-7u3-linux-i586.rpm
 rpm -ivh http://download01.thoughtworks.com/go/12.2.1/ga/go-server-12.2.1-15143.noarch.rpm
