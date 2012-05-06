@@ -9,13 +9,11 @@ namespace :aws do
 
   desc "creates the CI environment"
   task :ci_start => "package:puppet" do
-    role = "buildserver"
-    boot_package_url = setup_bootstrap
-    buildserver_boot_script = ERB.new(File.read("#{SCRIPTS_DIR}/boot.erb")).result(binding)
-
-    template = CloudFormationTemplate.new(:from => "ci-cloud-formation-template",
-                                          :with_vars => {"boot_script" => buildserver_boot_script})
-
+    buildserver_boot_script = erb(File.read("#{SCRIPTS_DIR}/boot.erb"),
+                                  :role => "buildserver",
+                                  :boot_package_url => setup_bootstrap)
+    template = CloudFormationTemplate.new("ci-cloud-formation-template",
+                                          :boot_script => buildserver_boot_script)
     Stacks.new(:named => STACK_NAME,
                :using_template => template.as_json_obj,
                :with_settings => SETTINGS).create do |stack|

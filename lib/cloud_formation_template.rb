@@ -1,10 +1,10 @@
-require "erb"
 require "json"
 
 class CloudFormationTemplate
   TEMPLATES_DIR = "#{File.dirname(__FILE__)}/../templates"
 
-  def initialize data
+  def initialize(template_file, data)
+    @template_file = template_file
     @data = data
   end
 
@@ -13,14 +13,7 @@ class CloudFormationTemplate
   end
 
   private
-  def template_body
-    File.read("#{TEMPLATES_DIR}/#{@data[:from]}.erb")
-  end
-
   def merged_template
-    @data[:with_vars].each do |name, value|
-      instance_variable_set("@#{name}", value)
-    end
-    ERB.new(template_body).result(binding)
+    erb(File.read("#{TEMPLATES_DIR}/#{@template_file}.erb"), @data)
   end
 end
