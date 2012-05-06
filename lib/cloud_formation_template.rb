@@ -3,7 +3,6 @@ require "json"
 
 class CloudFormationTemplate
   TEMPLATES_DIR = "#{File.dirname(__FILE__)}/../templates"
-  SCRIPTS_DIR = "#{File.dirname(__FILE__)}/../scripts"
 
   def initialize data
     @data = data
@@ -19,8 +18,8 @@ class CloudFormationTemplate
   end
 
   def merged_template
-    @data[:with_vars].each do |var_name|
-      instance_variable_set("@#{var_name}", ERB.new(File.read("#{SCRIPTS_DIR}/#{var_name}.erb")).result)
+    @data[:with_vars].each do |name, value|
+      instance_variable_set("@#{name}", value)
     end
     ERB.new(template_body).result(binding)
   end
