@@ -40,6 +40,6 @@ namespace :aws do
       puts "uploading bootstrap package...".cyan
       bucket.objects[BOOTSTRAP_FILE].write(File.read("#{BUILD_DIR}/#{BOOTSTRAP_FILE}"))
     end
-    bucket.url
+    bucket.objects[BOOTSTRAP_FILE].url_for(:read)
   end
 end
