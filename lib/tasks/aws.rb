@@ -40,4 +40,23 @@ namespace :aws do
     end
     bucket.objects[BOOTSTRAP_FILE].url_for(:read)
   end
+
+  desc "creates the UAT environment"
+  task :uat_start do
+    template = CloudFormationTemplate.new(:from => "vpc-uat-formation-template", :with_vars => ["boot_script"])
+
+    Stacks.new(:named => "uat-test",
+               :using_template => template.as_json_obj,
+               :with_settings => AWSSettings.prepare).create do |stack|
+      p stack.outputs
+    end
+  end
+
+  desc "destroys the UAT environment"
+  task :uat_stop do
+    AWSSettings.prepare
+    Stacks.new(:named => "uat-test").delete!
+  end
+
+>>>>>>> setting up test template for uat. :nigel
 end
