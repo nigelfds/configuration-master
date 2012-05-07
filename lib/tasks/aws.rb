@@ -35,9 +35,9 @@ namespace :aws do
     unless bucket.exists?
       puts "creating S3 bucket".cyan
       bucket = s3.buckets.create(bucket_name)
-      puts "uploading bootstrap package...".cyan
-      bucket.objects[BOOTSTRAP_FILE].write(File.read("#{BUILD_DIR}/#{BOOTSTRAP_FILE}"))
     end
+    puts "uploading bootstrap package...".cyan
+    bucket.objects[BOOTSTRAP_FILE].write(File.read("#{BUILD_DIR}/#{BOOTSTRAP_FILE}"))
     bucket.objects[BOOTSTRAP_FILE].url_for(:read)
   end
 end
