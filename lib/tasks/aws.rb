@@ -57,6 +57,4 @@ namespace :aws do
     AWSSettings.prepare
     Stacks.new(:named => "uat-test").delete!
   end
-
->>>>>>> setting up test template for uat. :nigel
 end
