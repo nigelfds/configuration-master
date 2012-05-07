@@ -32,6 +32,22 @@
 				</jobs>
 			</stage>
 		</pipeline>
+    <pipeline name="SystemIntegration" isLocked="true">
+			<materials>
+        <pipeline pipelineName="AwsTwitterFeedProject" stageName="CommitBuild" materialName="upstreamArtifactApp" />
+        <pipeline pipelineName="ConfigurationMasterProject" stageName="CommitBuild" materialName="upstreamArtifactConfiguration" />
+        <git url="https://github.com/nigelfds/configuration-master" />
+			</materials>
+			<stage name="CommitBuild">
+				<jobs>
+					<job name="package">
+						<tasks>
+							<exec command="./go" args="" />
+						</tasks>
+					</job>
+				</jobs>
+			</stage>
+		</pipeline>
   </pipelines>
 </cruise>
 
