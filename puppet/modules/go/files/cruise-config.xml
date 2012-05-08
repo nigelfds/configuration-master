@@ -26,8 +26,11 @@
 				<jobs>
 					<job name="package">
 						<tasks>
-							<exec command="./go" args="" />
+							<exec command="./go" args="package:puppet" />
 						</tasks>
+            <artifacts>
+              <artifact src="configuration-master-0.0.1.tar" dest="build" />
+            </artifacts>
 					</job>
 				</jobs>
 			</stage>

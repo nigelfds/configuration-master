@@ -8,7 +8,7 @@ namespace :aws do
   SCRIPTS_DIR = "#{File.dirname(__FILE__)}/../../scripts"
 
   desc "creates the CI environment"
-  task :ci_start => "package:puppet" do
+  task :ci_start => ["clean", "package:puppet"] do
     buildserver_boot_script = erb(File.read("#{SCRIPTS_DIR}/boot.erb"),
                                   :role => "buildserver",
                                   :boot_package_url => setup_bootstrap)
