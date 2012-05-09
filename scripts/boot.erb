@@ -11,5 +11,5 @@ cd /tmp/boot/puppet
 
 export FACTER_WORK_DIR=/tmp/boot/puppet
 <%= facter_variables %>
-puppet apply --modulepath=modules <%= role %>.pp
+puppet apply --modulepath=modules <%= role %>.pp > /var/log/puppet-log
 
