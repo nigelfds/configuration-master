@@ -1,6 +1,7 @@
 require 'aws_settings'
 require 'cloud_formation_template'
 require 'stacks'
+require "system_integration_pipeline"
 
 namespace :aws do
   SETTINGS = AWSSettings.prepare
@@ -11,6 +12,7 @@ namespace :aws do
   task :ci_start => ["clean", "package:puppet"] do
     buildserver_boot_script = erb(File.read("#{SCRIPTS_DIR}/boot.erb"),
                                   :role => "buildserver",
+                                  :facter_variables => "",
                                   :boot_package_url => setup_bootstrap)
     template = CloudFormationTemplate.new("ci-cloud-formation-template",
                                           :boot_script => buildserver_boot_script)
@@ -30,15 +32,21 @@ namespace :aws do
 
   task :build_appserver do
     ec2 = AWS::EC2.new
+    pipeline = SystemIntegrationPipeline.new
     boot_script = erb(File.read("#{SCRIPTS_DIR}/boot.erb"),
+                      :role => "appserver",
+                      :facter_variables => "export FACTER_ARTIFACT=#{pipeline.aws_twitter_feed_artifact}\n",
+                      :boot_package_url => pipeline.configuration_master_artifact)
+
     template = CloudFormationTemplate.new("appserver-creation-template", :boot_script => boot_script)
     stacks = Stacks.new(:named => "appserver-creation",
-                       :using_template => template.as_json_obj,
-                       :with_settings => SETTINGS)
+                        :using_template => template.as_json_obj,
+                        :with_settings => SETTINGS)
     begin
       stacks.create do |stack|
         instance = stack.resources.find { |resource| resource.resource_type == "AWS::EC2::Instance" }
 
+        # public dns name not available here: stack resource obj
         test_application instance.public_dns_name
 
         # add build number to the image name
@@ -47,7 +55,7 @@ namespace :aws do
         File.open("#{BUILD_DIR}/image", "w") { |file| file.write(image.id) }
       end
     ensure
-      stacks.delete!
+  #    stacks.delete!
     end
   end
 

@@ -7,6 +7,7 @@ GEM
       json (~> 1.4)
       nokogiri (>= 1.4.4)
       uuidtools (~> 2.1)
+    bouncy-castle-java (1.5.0146.1)
     childprocess (0.3.2)
       ffi (~> 1.0.6)
     colorize (0.5.8)
@@ -18,6 +19,8 @@ GEM
       multi_json (~> 1.0)
       multi_xml
     i18n (0.6.0)
+    jruby-openssl (0.7.6.1)
+      bouncy-castle-java (>= 1.5.0146.1)
     json (1.5.4)
     json (1.5.4-java)
     log4r (1.1.10)
@@ -55,6 +58,7 @@ PLATFORMS
 DEPENDENCIES
   aws-sdk
   colorize
+  jruby-openssl
   rake
   rspec
   vagrant (= 1.0.1)
