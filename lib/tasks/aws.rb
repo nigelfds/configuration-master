@@ -28,6 +28,35 @@ namespace :aws do
     Stacks.new(:named => STACK_NAME).delete!
   end
 
+  task :build_appserver do
+    template = CloudFormationTemplate.new("appserver-creation", {})
+    stack = Stacks.new(:named => "appserver-creation",
+                       :using_template => template.as_json_obj,
+                       :with_settings => SETTINGS)
+    begin
+      stack.create do |stack|
+        ec2 = AWS::EC2.new
+        instance = stack.resources.find { |resource| resource.resource_type == "AWS::EC2::Instance" }
+        test_application instance.public_dns_name
+
+        image = ec2.images.create(:instance_id => instance.physical_resource_id, :name => "testimage")
+        sleep 1 until image.state.to_s.eql? "available"
+        File.open("#{BUILD_DIR}/image", "w") { |file| file.write(image.id) }
+      end
+    ensure
+      stack.delete!
+    end
+  end
+
+  def test_application(host)
+    puts "testing..."
+    (1..10).each do |n|
+      puts n
+      sleep 1
+    end
+    puts "all good!"
+  end
+
   def setup_bootstrap
     s3 = AWS::S3.new
     bucket_name = "#{STACK_NAME}-bootstrap-bucket"
