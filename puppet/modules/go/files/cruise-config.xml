@@ -21,7 +21,7 @@
     <pipeline name="ConfigurationMasterProject" isLocked="true">
       <environmentvariables>
         <variable name="SETTINGS_FILE">
-          <value>/var/boot/puppet/settings.yaml</value>
+          <value>/tmp/boot/puppet/settings.yaml</value>
         </variable>
       </environmentvariables>
       <materials>
