@@ -9,11 +9,11 @@ namespace :aws do
 
   desc "creates the CI environment"
   task :ci_start => ["clean", "package:puppet"] do
-    buildserver_boot_script = erb(File.read("#{SCRIPTS_DIR}/boot.erb"),
+    build_server_boot_script = erb(File.read("#{SCRIPTS_DIR}/boot.erb"),
                                   :role => "buildserver",
                                   :boot_package_url => setup_bootstrap)
     template = CloudFormationTemplate.new("ci-cloud-formation-template",
-                                          :boot_script => buildserver_boot_script)
+                                          :boot_script => build_server_boot_script)
     Stacks.new(:named => STACK_NAME,
                :using_template => template.as_json_obj,
                :with_settings => SETTINGS).create do |stack|
@@ -59,7 +59,7 @@ namespace :aws do
 
   def setup_bootstrap
     s3 = AWS::S3.new
-    bucket_name = "#{STACK_NAME}-bootstrap-bucket"
+    bucket_name = "#{STACK_NAME}-bootstrap-bucket-#{AWSSettings.prepare["aws_ssh_key_name"]}"
     bucket = s3.buckets[bucket_name]
     unless bucket.exists?
       puts "creating S3 bucket".cyan
