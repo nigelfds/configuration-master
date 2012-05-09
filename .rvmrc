@@ -1,2 +1,3 @@
 rvm_install_on_use_flag=1
-rvm use ruby-1.9.2-p290@configuration-master --create
+rvm use jruby-1.6.7@configuration-master --create
+
