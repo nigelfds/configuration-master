@@ -30,7 +30,7 @@ namespace :aws do
     Stacks.new(:named => STACK_NAME).delete!
   end
 
-  task :build_appserver do
+  task :build_appserver => BUILD_DIR do
     ec2 = AWS::EC2.new
     pipeline = SystemIntegrationPipeline.new
     boot_script = erb(File.read("#{SCRIPTS_DIR}/boot.erb"),
@@ -54,7 +54,7 @@ namespace :aws do
         File.open("#{BUILD_DIR}/image", "w") { |file| file.write(image.id) }
       end
     ensure
-  #    stacks.delete!
+      stacks.delete!
     end
   end
 

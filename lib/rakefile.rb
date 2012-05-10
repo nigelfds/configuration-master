@@ -2,6 +2,8 @@ $LOAD_PATH << File.dirname(__FILE__)
 BUILD_DIR = "build"
 BOOTSTRAP_FILE = "boot.tar.gz"
 
+directory BUILD_DIR
+
 require "colorize"
 require "rake/clean"
 require "simple_erb"
