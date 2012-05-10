@@ -17,9 +17,14 @@ class SystemIntegrationPipeline
 
   def fetch_artifact(pipeline_name, artifact_dir)
     variable_name = "GO_DEPENDENCY_LOCATOR_UPSTREAMARTIFACT#{pipeline_name}"
-    uri = "#{ENV['GO_SERVER_URL']}files/#{ENV[variable_name]}/package.json"
+    uri = "http://#{hostname}:8153/go/files/#{ENV[variable_name]}/package.json"
+    puts "Fetching artifact from #{uri}"
     response = Net::HTTP.get_response(URI(uri))
     json = JSON.parse(response.body)
     json.find { |element| element["name"].eql? artifact_dir }["files"].first["url"]
+  end
+
+  def hostname
+    %x{ec2-metadata -p}.chomp.split(":")[1].strip
   end
 end
