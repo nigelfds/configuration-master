@@ -55,10 +55,7 @@
         <jobs>
           <job name="package">
             <tasks>
-              <exec command="/bin/echo">
-                <arg>'hello'</arg>
-                <runif status="passed" />
-              </exec>
+              <exec command="./go" args="aws:build_appserver" />
             </tasks>
           </job>
         </jobs>
