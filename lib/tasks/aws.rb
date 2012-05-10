@@ -10,12 +10,12 @@ namespace :aws do
 
   desc "creates the CI environment"
   task :ci_start => ["clean", "package:puppet"] do
-    build_server_boot_script = erb(File.read("#{SCRIPTS_DIR}/boot.erb"),
+    buildserver_boot_script = erb(File.read("#{SCRIPTS_DIR}/boot.erb"),
                                   :role => "buildserver",
                                   :facter_variables => "",
                                   :boot_package_url => setup_bootstrap)
     template = CloudFormationTemplate.new("ci-cloud-formation-template",
-                                          :boot_script => build_server_boot_script)
+                                          :boot_script => buildserver_boot_script)
     Stacks.new(:named => STACK_NAME,
                :using_template => template.as_json_obj,
                :with_settings => SETTINGS).create do |stack|
@@ -46,8 +46,7 @@ namespace :aws do
       stacks.create do |stack|
         instance = stack.resources.find { |resource| resource.resource_type == "AWS::EC2::Instance" }
 
-        # public dns name not available here: stack resource obj
-        test_application instance.public_dns_name
+        test_application ec2.instances[instance.physical_resource_id].public_dns_name
 
         # add build number to the image name
         image = ec2.images.create(:instance_id => instance.physical_resource_id, :name => "testimage")
@@ -60,7 +59,7 @@ namespace :aws do
   end
 
   def test_application(host)
-    puts "testing..."
+    puts "testing... #{host}"
     (1..10).each do |n|
       puts n
       sleep 1
@@ -70,7 +69,7 @@ namespace :aws do
 
   def setup_bootstrap
     s3 = AWS::S3.new
-    bucket_name = "#{STACK_NAME}-bootstrap-bucket-#{AWSSettings.prepare["aws_ssh_key_name"]}"
+    bucket_name = "#{STACK_NAME}-bootstrap-bucket"
     bucket = s3.buckets[bucket_name]
     unless bucket.exists?
       puts "creating S3 bucket".cyan
