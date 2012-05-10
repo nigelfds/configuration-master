@@ -77,6 +77,6 @@ namespace :aws do
     end
     puts "uploading bootstrap package...".cyan
     bucket.objects[BOOTSTRAP_FILE].write(File.read("#{BUILD_DIR}/#{BOOTSTRAP_FILE}"))
-    bucket.objects[BOOTSTRAP_FILE].url_for(:read)
+    bucket.objects[BOOTSTRAP_FILE].url_for(:read, :expires => 10 * 60)
   end
 end
