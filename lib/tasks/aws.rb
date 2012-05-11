@@ -67,7 +67,7 @@ namespace :aws do
     stack = Stacks.new(:named => "production-environment",
                        :using_template => template.as_json_obj,
                        :with_settings => SETTINGS)
-    stack.update
+    stack.create_or_update
     #roll_in_new_version
   end
 

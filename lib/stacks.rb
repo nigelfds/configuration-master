@@ -3,6 +3,7 @@ require "aws-sdk"
 class Stacks
   def initialize data
     @data = data
+    @data[:variables] ||= {}
   end
 
   def create(&block)
@@ -23,8 +24,11 @@ class Stacks
   def update
     cloud_formation = AWS::CloudFormation.new
     stack = cloud_formation.stacks[name]
-    return unless stack.exists?
-    stack.update :template => template
+    if stack.exists?
+      stack.update :template => template
+    else
+      create
+    end
     #roll in new servers
   end
 
