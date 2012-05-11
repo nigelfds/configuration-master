@@ -3,6 +3,8 @@ require 'cloud_formation_template'
 require 'stacks'
 require "system_integration_pipeline"
 require "production_deploy_pipeline"
+require "net/http"
+require "uri"
 
 namespace :aws do
   SETTINGS = AWSSettings.prepare
@@ -61,11 +63,12 @@ namespace :aws do
 
   task :deploy_to_production do
     pipeline = ProductionDeployPipeline.new
-    image_id = pipeline.upstream_artifact.chomp
-    template = CloudFormationTemplate.new("production-environment",
-                                          :variables => {"ImageId" => image_id})
+    image_id = Net::HTTP.get_response(URI(pipeline.upstream_artifact)).body.chomp
+    puts "deploying image '#{image_id}' to production"
+    template = CloudFormationTemplate.new("production-environment", {})
     stack = Stacks.new(:named => "production-environment",
                        :using_template => template.as_json_obj,
+                       :variables => {"ImageId" => image_id},
                        :with_settings => SETTINGS)
     stack.create_or_update
     #roll_in_new_version

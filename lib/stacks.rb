@@ -25,9 +25,19 @@ class Stacks
     cloud_formation = AWS::CloudFormation.new
     stack = cloud_formation.stacks[name]
     if stack.exists?
-      stack.update :template => template
+      puts "updating production environment with the new version"
+      begin
+        stack.update :template => template, :parameters => parameters[:parameters]
+      rescue Exception => e
+        if e.message.eql? "No updates are to be performed."
+          puts e.message
+          return
+        else
+          raise
+        end
+      end
     else
-      create
+      create { |stack| }
     end
     #roll in new servers
   end
@@ -52,7 +62,7 @@ class Stacks
   def parameters
     #todo: get rid of erb replacement
     values = {"KeyName" => @data[:with_settings].aws_ssh_key_name}
-    values.merge @data[:variables]
+    values.merge! @data[:variables]
     {:parameters => values}
   end
 end
