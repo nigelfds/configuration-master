@@ -39,7 +39,6 @@ class Stacks
     else
       create { |stack| }
     end
-    #roll in new servers
   end
 
   def delete!

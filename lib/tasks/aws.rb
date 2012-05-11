@@ -71,7 +71,24 @@ namespace :aws do
                        :variables => {"ImageId" => image_id},
                        :with_settings => SETTINGS)
     stack.create_or_update
-    #roll_in_new_version
+    roll_in_new_version image_id
+  end
+
+  def roll_in_new_version(image_id)
+    auto_scaling = AWS::AutoScaling.new
+    instances = auto_scaling.instances
+    instances_to_retire = instances.select { |i| not i.ec2_instance.image_id.eql?(image_id) }
+    puts "#{instances_to_retire.size} instances have to be updated with the new configuration"
+    instances_to_retire.each do |instance|
+      puts "terminating instance '#{instance.instance_id}'"
+      instance.terminate(false)
+      sleep 10
+      while true
+        break if auto_scaling.instances.select { |i| i.ec2_instance.status.eql? :running }.count == 2
+        sleep 5
+      end
+    end
+    puts "all instances updated successfuly"
   end
 
   def test_application(host)
