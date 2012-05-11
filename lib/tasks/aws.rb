@@ -49,7 +49,8 @@ namespace :aws do
         test_application ec2.instances[instance.physical_resource_id].public_dns_name
 
         # add build number to the image name
-        image = ec2.images.create(:instance_id => instance.physical_resource_id, :name => "testimage")
+        image = ec2.images.create(:instance_id => instance.physical_resource_id,
+                                  :name => "aws-twitter-feed-#{ENV['GO_PIPELINE_COUNTER']}")
         sleep 1 until image.state.to_s.eql? "available"
         File.open("#{BUILD_DIR}/image", "w") { |file| file.write(image.id) }
       end
