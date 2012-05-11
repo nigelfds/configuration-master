@@ -64,6 +64,29 @@
         </jobs>
       </stage>
     </pipeline>
+    <pipeline name="ProductionDeploy">
+      <environmentvariables>
+        <variable name="SETTINGS_FILE">
+          <value>/tmp/boot/puppet/settings.yaml</value>
+        </variable>
+      </environmentvariables>
+      <materials>
+        <pipeline pipelineName="SystemIntegration" stageName="CommitBuild" />
+        <git url="https://github.com/nigelfds/configuration-master" materialName="configurationMaster" />
+      </materials>
+      <stage name="CommitBuild">
+        <approval type="manual" />
+        <jobs>
+          <job name="Deploy">
+            <tasks>
+              <exec command="./go">
+                <arg>aws:deploy_to_production</arg>
+              </exec>
+            </tasks>
+          </job>
+        </jobs>
+      </stage>
+    </pipeline>
   </pipelines>
 </cruise>
 
