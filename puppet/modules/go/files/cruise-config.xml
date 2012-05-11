@@ -71,7 +71,7 @@
         </variable>
       </environmentvariables>
       <materials>
-        <pipeline pipelineName="SystemIntegration" stageName="CommitBuild" />
+        <pipeline pipelineName="SystemIntegration" stageName="CommitBuild" materialName="upstreamArtifactSystest" />
         <git url="https://github.com/nigelfds/configuration-master" materialName="configurationMaster" />
       </materials>
       <stage name="CommitBuild">

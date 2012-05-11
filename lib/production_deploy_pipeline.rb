@@ -7,7 +7,7 @@ class ProductionDeployPipeline
   end
 
   def upstream_artifact
-    fetch_artifact "APP", "build"
+    fetch_artifact "SYSTEST", "build"
   end
 
   def fetch_artifact(pipeline_name, artifact_dir)
