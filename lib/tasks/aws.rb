@@ -70,7 +70,7 @@ namespace :aws do
 
   def setup_bootstrap
     s3 = AWS::S3.new
-    bucket_name = "#{STACK_NAME}-bootstrap-bucket"
+    bucket_name = "#{STACK_NAME}-bootstrap-bucket-#{AWSSettings.prepare.aws_ssh_key_name}"
     bucket = s3.buckets[bucket_name]
     unless bucket.exists?
       puts "creating S3 bucket".cyan
