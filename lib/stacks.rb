@@ -21,7 +21,7 @@ class Stacks
     yield stack
   end
 
-  def update
+  def create_or_update
     cloud_formation = AWS::CloudFormation.new
     stack = cloud_formation.stacks[name]
     if stack.exists?
