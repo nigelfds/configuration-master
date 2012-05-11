@@ -2,6 +2,7 @@ require 'aws_settings'
 require 'cloud_formation_template'
 require 'stacks'
 require "system_integration_pipeline"
+require "production_deploy_pipeline"
 
 namespace :aws do
   SETTINGS = AWSSettings.prepare
@@ -48,7 +49,6 @@ namespace :aws do
 
         test_application ec2.instances[instance.physical_resource_id].public_dns_name
 
-        # add build number to the image name
         image = ec2.images.create(:instance_id => instance.physical_resource_id,
                                   :name => "aws-twitter-feed-#{ENV['GO_PIPELINE_COUNTER']}")
         sleep 1 until image.state.to_s.eql? "available"
@@ -57,6 +57,18 @@ namespace :aws do
     ensure
       stacks.delete!
     end
+  end
+
+  task :deploy_to_production do
+    pipeline = ProductionDeployPipeline.new
+    image_id = pipeline.upstream_artifact.chomp
+    template = CloudFormationTemplate.new("production-environment",
+                                          :variables => {"ImageId" => image_id})
+    stack = Stacks.new(:named => "production-environment",
+                       :using_template => template.as_json_obj,
+                       :with_settings => SETTINGS)
+    stack.update
+    #roll_in_new_version
   end
 
   def test_application(host)

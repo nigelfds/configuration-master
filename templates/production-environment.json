@@ -10,6 +10,10 @@
 		"KeyName":{
 			"Description":"Name of an existing EC2 KeyPair to enable SSH access to the instances",
 			"Type":"String"
+		},
+		"ImageId":{
+			"Description":"The image holding the application code",
+			"Type":"String"
 		}
 	},
 	"Resources":{

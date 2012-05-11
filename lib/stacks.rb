@@ -5,7 +5,7 @@ class Stacks
     @data = data
   end
 
-  def create &block
+  def create(&block)
     cloud_formation = AWS::CloudFormation.new
     stack = cloud_formation.stacks[name]
     (puts("the CI environment exists already. Nothing to do") and return) if stack.exists?
@@ -18,6 +18,14 @@ class Stacks
     end
     puts "the CI environment has been provisioned successfully".white
     yield stack
+  end
+
+  def update
+    cloud_formation = AWS::CloudFormation.new
+    stack = cloud_formation.stacks[name]
+    return unless stack.exists?
+    stack.update :template => template
+    #roll in new servers
   end
 
   def delete!
@@ -38,6 +46,9 @@ class Stacks
   end
 
   def parameters
-    {:parameters => {"KeyName" => @data[:with_settings].aws_ssh_key_name}}
+    #todo: get rid of erb replacement
+    values = {"KeyName" => @data[:with_settings].aws_ssh_key_name}
+    values.merge @data[:variables]
+    {:parameters => values}
   end
 end
