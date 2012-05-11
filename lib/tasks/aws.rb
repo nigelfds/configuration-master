@@ -64,17 +64,19 @@ namespace :aws do
   task :deploy_to_production do
     pipeline = ProductionDeployPipeline.new
     image_id = Net::HTTP.get_response(URI(pipeline.upstream_artifact)).body.chomp
-    puts "deploying image '#{image_id}' to production"
+    puts "updating production configuration with image '#{image_id}'"
     template = CloudFormationTemplate.new("production-environment", {})
     stack = Stacks.new(:named => "production-environment",
                        :using_template => template.as_json_obj,
                        :variables => {"ImageId" => image_id},
                        :with_settings => SETTINGS)
     stack.create_or_update
-    roll_in_new_version image_id
   end
 
-  def roll_in_new_version(image_id)
+  task :roll_new_version do
+    pipeline = ProductionDeployPipeline.new
+    image_id = Net::HTTP.get_response(URI(pipeline.upstream_artifact)).body.chomp
+    puts "rolling image #{image_id} into production"
     auto_scaling = AWS::AutoScaling.new
     instances = auto_scaling.instances
     instances_to_retire = instances.select { |i| not i.ec2_instance.image_id.eql?(image_id) }
