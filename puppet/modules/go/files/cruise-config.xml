@@ -57,6 +57,9 @@
             <tasks>
               <exec command="./go" args="aws:build_appserver" />
             </tasks>
+            <artifacts>
+              <artifact src="build/image" dest="build" />
+            </artifacts>
           </job>
         </jobs>
       </stage>
