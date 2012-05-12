@@ -1,6 +1,7 @@
 require "json"
 require "base64"
 require "aws-sdk"
+require "ops/instance"
 
 class Stacks
   TEMPLATES_DIR = "#{File.dirname(__FILE__)}/../templates"
