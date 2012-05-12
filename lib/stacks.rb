@@ -10,7 +10,7 @@ class Stacks
     @variables = variables
   end
 
-  def create(&block)
+  def create
     cloud_formation = AWS::CloudFormation.new
     stack = cloud_formation.stacks[@name]
     (puts("the CI environment exists already. Nothing to do") and return) if stack.exists?
@@ -21,7 +21,7 @@ class Stacks
         raise "error creating stack!".red if status == "ROLLBACK_COMPLETE"
     end
     puts "the CI environment has been provisioned successfully".white
-    yield stack
+    yield stack if block_given?
   end
 
   def create_or_update
@@ -40,7 +40,7 @@ class Stacks
         end
       end
     else
-      create { |stack| }
+      create
     end
   end
 

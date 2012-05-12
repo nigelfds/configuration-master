@@ -14,11 +14,11 @@ namespace :aws do
     puppet_bootstrap = PuppetBootstrap.new(:role => "buildserver",
                                            :facter_variables => "",
                                            :boot_package_url => setup_bootstrap)
-    puts "booting the CI environment"
     stacks = Stacks.new("ci-cloud-formation-template",
                         "KeyName" => SETTINGS.aws_ssh_key_name,
                         "BootScript" => puppet_bootstrap.script)
 
+    puts "booting the CI environment"
     stacks.create do |stack|
       instance = stack.outputs.find { |output| output.key == "PublicIP" }
       puts "your CI server's address is #{instance.value}"
@@ -34,8 +34,8 @@ namespace :aws do
     ec2 = AWS::EC2.new
     pipeline = Go::SystemIntegrationPipeline.new
     puppet_bootstrap = PuppetBootstrap.new(:role => "appserver",
-                                          :facter_variables => "export FACTER_ARTIFACT=#{pipeline.aws_twitter_feed_artifact}\n",
-                                          :boot_package_url => pipeline.configuration_master_artifact)
+                                           :facter_variables => "export FACTER_ARTIFACT=#{pipeline.aws_twitter_feed_artifact}\n",
+                                           :boot_package_url => pipeline.configuration_master_artifact)
 
     stacks = Stacks.new("appserver-creation-template",
                         "KeyName" => SETTINGS.aws_ssh_key_name,
