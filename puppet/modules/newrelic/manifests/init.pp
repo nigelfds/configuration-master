@@ -10,9 +10,10 @@ class newrelic {
     require => Package["newrelic-repo"],
   }
 
-  exec { "/usr/sbin/nrsysmond-config --set license_key=33bc054596d2e8c21ad5aa0afe4d570338bd7d63":
+  exec { "config-newrelic":
+    command => "/usr/sbin/nrsysmond-config --set license_key=33bc054596d2e8c21ad5aa0afe4d570338bd7d63",
     require => Package["newrelic-sysmond"],
   }
 
-  service { "newrelic-sysmond": ensure => "running" }
+  service { "newrelic-sysmond": ensure => "running", require => Exec["config-newrelic"] }
 }
