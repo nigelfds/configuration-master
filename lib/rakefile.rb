@@ -6,7 +6,6 @@ directory BUILD_DIR
 
 require "colorize"
 require "rake/clean"
-require "simple_erb"
 require "tasks/aws"
 require "tasks/package"
 require "rspec/core/rake_task"

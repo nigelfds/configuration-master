@@ -2,21 +2,21 @@ require 'aws_settings'
 require 'stacks'
 require "system_integration_pipeline"
 require "production_deploy_pipeline"
+require "puppet_bootstrap"
 require "net/http"
 require "uri"
 
 namespace :aws do
   SETTINGS = AWSSettings.prepare
-  SCRIPTS_DIR = "#{File.dirname(__FILE__)}/../../scripts"
 
   desc "creates the CI environment"
   task :ci_start => ["clean", "package:puppet"] do
-    buildserver_boot_script = erb(File.read("#{SCRIPTS_DIR}/boot.erb"),
-                                  :role => "buildserver",
-                                  :facter_variables => "",
-                                  :boot_package_url => setup_bootstrap)
+    puppet_bootstrap = PuppetBootstrap.new(:role => "buildserver",
+                                           :facter_variables => "",
+                                           :boot_package_url => setup_bootstrap)
+    puts "booting the CI environment"
     Stacks.new(:using_template => "ci-cloud-formation-template",
-               :variables => { "BootScript" => buildserver_boot_script },
+               :variables => { "BootScript" => puppet_bootstrap.script },
                :with_settings => SETTINGS).create do |stack|
 
       instance = stack.outputs.find { |output| output.key == "PublicIP" }
@@ -32,13 +32,12 @@ namespace :aws do
   task :build_appserver => BUILD_DIR do
     ec2 = AWS::EC2.new
     pipeline = SystemIntegrationPipeline.new
-    boot_script = erb(File.read("#{SCRIPTS_DIR}/boot.erb"),
-                      :role => "appserver",
-                      :facter_variables => "export FACTER_ARTIFACT=#{pipeline.aws_twitter_feed_artifact}\n",
-                      :boot_package_url => pipeline.configuration_master_artifact)
+    puppet_boostrap = PuppetBootstrap.new(:role => "appserver",
+                                          :facter_variables => "export FACTER_ARTIFACT=#{pipeline.aws_twitter_feed_artifact}\n",
+                                          :boot_package_url => pipeline.configuration_master_artifact)
 
     stacks = Stacks.new(:using_template => "appserver-creation-template",
-                        :variables => { "BootScript" => boot_script },
+                        :variables => { "BootScript" => puppet_boostrap.script },
                         :with_settings => SETTINGS)
     begin
       stacks.create do |stack|
