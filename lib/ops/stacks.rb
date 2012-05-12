@@ -20,7 +20,7 @@ module Ops
       stack = cloud_formation.stacks.create(@name, template, parameters)
       while ((status = stack.status) != "CREATE_COMPLETE")
         raise "error creating stack!" if status == "ROLLBACK_COMPLETE"
-        sleep 5
+        sleep 10
       end
       puts "environment successfully provisioned"
       yield stack if block_given?
