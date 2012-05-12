@@ -1,4 +1,6 @@
 require "aws-sdk"
+require "socket"
+require "timeout"
 
 module Ops
   class RollingUpgrade
@@ -16,8 +18,25 @@ module Ops
         instance.terminate(false)
         sleep 10
         while true
-          break if auto_scaling.instances.select { |i| i.ec2_instance.status.eql? :running }.count == 2
+          break if all_ready?(auto_scaling.instances)
           sleep 5
+        end
+      end
+    end
+
+    def all_ready?(instances)
+      running_instances = instances.select { |i| i.ec2_instance.status.eql? :running }
+      servicing_requests = running_instances.select { |i| accepting_requests?(i.ec2_instance.ip_address) }
+      servicing_requests.count == 2
+    end
+
+    def accepting_requests?(ip)
+      Timeout::timeout(2) do
+        begin
+          TCPSocket.new(ip, 8080).close
+          true
+        rescue Errno::ECONNREFUSED, Errno::EHOSTUNREACH
+          false
         end
       end
     end
