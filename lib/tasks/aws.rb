@@ -22,7 +22,7 @@ namespace :aws do
     puts "booting the CI environment"
     stacks.create do |stack|
       instance = stack.outputs.find { |output| output.key == "PublicAddress" }
-      puts "your CI server's address is #{instance.value}"
+      puts "your CI server's address is http://#{instance.value}:8153"
     end
   end
 
