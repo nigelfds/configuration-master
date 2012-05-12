@@ -31,6 +31,7 @@ namespace :aws do
     Ops::Stacks.new("ci-environment").delete!
   end
 
+  desc "creates a new instance of the application server"
   task :build_appserver do
     pipeline = Go::SystemIntegrationPipeline.new
     puppet_bootstrap = Ops::PuppetBootstrap.new(:role => "appserver",
@@ -44,6 +45,7 @@ namespace :aws do
     stack.create
   end
 
+  desc "creates an image of an existing appserver instance"
   task :create_image => BUILD_DIR do
     stack = Ops::Stacks.new("appserver-validation")
     image_name = ENV["GO_PIPELINE_COUNTER"]+"-"+ENV["GO_REVISION"]+"-#{rand(999)}"
@@ -54,6 +56,7 @@ namespace :aws do
     stack.delete!
   end
 
+  desc "updates the production environment with a new appserver image"
   task :deploy_to_production do
     image_id = Go::ProductionDeployPipeline.new.upstream_artifact
     puts "updating production configuration with image '#{image_id}'"
@@ -64,6 +67,7 @@ namespace :aws do
     stack.create_or_update
   end
 
+  desc "replaces the existing production servers with the new image"
   task :roll_new_version do
     image_id = Go::ProductionDeployPipeline.new.upstream_artifact
     puts "rolling image #{image_id} into production"
