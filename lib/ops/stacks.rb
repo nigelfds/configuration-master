@@ -51,7 +51,7 @@ module Ops
       (puts "couldn't find stack. Nothing to do" and return) unless stack.exists?
 
       stack.delete
-      sleep 2 while AWS::CloudFormation.new.stacks[@name].exists?
+      sleep 10 while AWS::CloudFormation.new.stacks[@name].exists?
       puts "shutdown command successful"
     end
 
