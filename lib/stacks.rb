@@ -49,6 +49,7 @@ class Stacks
     (puts "couldn't find stack. Nothing to do" and return) unless stack.exists?
 
     stack.delete
+    sleep 2 if AWS::CloudFormation.new.stacks[@name].exists?
     puts "shutdown command successful"
   end
 

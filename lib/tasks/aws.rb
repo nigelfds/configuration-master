@@ -36,9 +36,11 @@ namespace :aws do
                                            :facter_variables => "export FACTER_ARTIFACT=#{pipeline.aws_twitter_feed_artifact}\n",
                                            :boot_package_url => pipeline.configuration_master_artifact)
 
-    Stacks.new("appserver-creation-template",
+    stack = Stacks.new("appserver-creation-template",
                "KeyName" => SETTINGS.aws_ssh_key_name,
-               "BootScript" => puppet_bootstrap.script).create
+               "BootScript" => puppet_bootstrap.script)
+    stack.delete!
+    stack.create
   end
 
   task :create_image => BUILD_DIR do
