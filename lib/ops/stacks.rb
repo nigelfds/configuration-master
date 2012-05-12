@@ -18,9 +18,9 @@ module Ops
       (puts("the CI environment exists already. Nothing to do") and return) if stack.exists?
 
       stack = cloud_formation.stacks.create(@name, template, parameters)
-      sleep 1 until stack.status == "CREATE_COMPLETE"
       while ((status = stack.status) != "CREATE_COMPLETE")
-        raise "error creating stack!".red if status == "ROLLBACK_COMPLETE"
+        raise "error creating stack!" if status == "ROLLBACK_COMPLETE"
+        sleep 5
       end
       puts "the CI environment has been provisioned successfully".white
       yield stack if block_given?
@@ -51,7 +51,7 @@ module Ops
       (puts "couldn't find stack. Nothing to do" and return) unless stack.exists?
 
       stack.delete
-      sleep 30 while AWS::CloudFormation.new.stacks[@name].exists?
+      sleep 30 while stack.exists?
       puts "shutdown command successful"
     end
 
