@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <cruise xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="cruise-config.xsd" schemaVersion="53">
-  <pipelines group="AwsDevOpsGroup">
-    <pipeline name="AwsTwitterFeedProject" isLocked="true">
+  <pipelines group="TwitterFeed">
+    <pipeline name="WebApplication" isLocked="true">
       <materials>
         <git url="https://github.com/nigelfds/aws-twitter-feed" />
       </materials>
-      <stage name="CommitBuild">
+      <stage name="Package">
         <jobs>
-          <job name="package">
+          <job name="Package">
             <tasks>
               <exec command="./go" args="package" />
             </tasks>
@@ -18,7 +18,7 @@
         </jobs>
       </stage>
     </pipeline>
-    <pipeline name="ConfigurationMasterProject" isLocked="true">
+    <pipeline name="Infrastructure" isLocked="true">
       <environmentvariables>
         <variable name="SETTINGS_FILE">
           <value>/tmp/boot/puppet/settings.yaml</value>
@@ -27,9 +27,9 @@
       <materials>
         <git url="https://github.com/nigelfds/configuration-master" />
       </materials>
-      <stage name="CommitBuild">
+      <stage name="Package">
         <jobs>
-          <job name="package">
+          <job name="Package">
             <tasks>
               <exec command="./go" args="package:puppet" />
             </tasks>
@@ -47,8 +47,8 @@
         </variable>
       </environmentvariables>
       <materials>
-        <pipeline pipelineName="AwsTwitterFeedProject" stageName="CommitBuild" materialName="upstreamArtifactApp" />
-        <pipeline pipelineName="ConfigurationMasterProject" stageName="CommitBuild" materialName="upstreamArtifactConfiguration" />
+        <pipeline pipelineName="WebApplication" stageName="Package" materialName="upstreamArtifactApp" />
+        <pipeline pipelineName="Infrastructure" stageName="Package" materialName="upstreamArtifactConfiguration" />
         <git url="https://github.com/nigelfds/configuration-master" />
       </materials>
       <stage name="BuildAppServer">
@@ -73,7 +73,7 @@
         </jobs>
       </stage>
     </pipeline>
-    <pipeline name="ProductionDeploy">
+    <pipeline name="ProductionDeploy" labeltemplate="${upstreamArtifactSystest}">
       <environmentvariables>
         <variable name="SETTINGS_FILE">
           <value>/tmp/boot/puppet/settings.yaml</value>
@@ -83,10 +83,10 @@
         <pipeline pipelineName="SystemIntegration" stageName="CreateImage" materialName="upstreamArtifactSystest" />
         <git url="https://github.com/nigelfds/configuration-master" materialName="configurationMaster" />
       </materials>
-      <stage name="CommitBuild">
+      <stage name="UpdateImage">
         <approval type="manual" />
         <jobs>
-          <job name="Deploy">
+          <job name="UpdateImage">
             <tasks>
               <exec command="./go">
                 <arg>aws:deploy_to_production</arg>
