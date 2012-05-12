@@ -1,10 +1,10 @@
 require "uri"
 require "net/http"
-require "ops/aws_settings"
-require "ops/stacks"
-require "ops/puppet_bootstrap"
-require "go/system_integration_pipeline"
-require "go/production_deploy_pipeline"
+require "lib/ops/aws_settings"
+require "lib/ops/stacks"
+require "lib/ops/puppet_bootstrap"
+require "lib/go/system_integration_pipeline"
+require "lib/go/production_deploy_pipeline"
 
 namespace :aws do
   SETTINGS = Ops::AWSSettings.load
@@ -84,7 +84,7 @@ namespace :aws do
 
   def setup_bootstrap
     s3 = AWS::S3.new
-    bucket_name = "aws-twitter-stream-bootstrap-bucket-#{AWSSettings.prepare.aws_ssh_key_name}"
+    bucket_name = "aws-twitter-stream-bootstrap-bucket-#{SETTINGS.aws_ssh_key_name}"
     bucket = s3.buckets[bucket_name]
     unless bucket.exists?
       puts "creating S3 bucket".cyan
