@@ -1,7 +1,7 @@
-require 'aws_settings'
-require 'stacks'
-require "system_integration_pipeline"
-require "production_deploy_pipeline"
+require "aws_settings"
+require "stacks"
+require "go/system_integration_pipeline"
+require "go/production_deploy_pipeline"
 require "puppet_bootstrap"
 require "net/http"
 require "uri"
@@ -32,7 +32,7 @@ namespace :aws do
 
   task :build_appserver => BUILD_DIR do
     ec2 = AWS::EC2.new
-    pipeline = SystemIntegrationPipeline.new
+    pipeline = Go::SystemIntegrationPipeline.new
     puppet_boostrap = PuppetBootstrap.new(:role => "appserver",
                                           :facter_variables => "export FACTER_ARTIFACT=#{pipeline.aws_twitter_feed_artifact}\n",
                                           :boot_package_url => pipeline.configuration_master_artifact)
@@ -57,7 +57,7 @@ namespace :aws do
   end
 
   task :deploy_to_production do
-    image_id = ProductionDeployPipeline.new.upstream_artifact
+    image_id = Go::ProductionDeployPipeline.new.upstream_artifact
     puts "updating production configuration with image '#{image_id}'"
 
     stack = Stacks.new("production-environment",
@@ -67,7 +67,7 @@ namespace :aws do
   end
 
   task :roll_new_version do
-    image_id = ProductionDeployPipeline.new.upstream_artifact
+    image_id = Go::ProductionDeployPipeline.new.upstream_artifact
     puts "rolling image #{image_id} into production"
 
     auto_scaling = AWS::AutoScaling.new
