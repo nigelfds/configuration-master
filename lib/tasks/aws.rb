@@ -28,6 +28,7 @@ namespace :aws do
 
   desc "stops the CI environment"
   task :ci_stop do
+    puts "stopping the CI environment"
     Ops::Stacks.new("ci-environment").delete!
   end
 
