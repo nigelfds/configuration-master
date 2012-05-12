@@ -5,7 +5,7 @@ require "aws-sdk"
 class Stacks
   TEMPLATES_DIR = "#{File.dirname(__FILE__)}/../templates"
 
-  def initialize(name, variables)
+  def initialize(name, variables = {})
     @name = name
     @variables = variables
   end
