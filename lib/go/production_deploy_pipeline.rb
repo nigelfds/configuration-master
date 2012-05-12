@@ -10,7 +10,7 @@ module Go
 
     def upstream_artifact
       artifact_uri = artifact_location("SYSTEST", "build")
-      Net::HTTP.get_response(URI(pipeline.upstream_artifact)).body.chomp
+      Net::HTTP.get_response(URI(artifact_uri)).body.chomp
     end
   end
 end
