@@ -7,11 +7,11 @@ module Go
     end
 
     def aws_twitter_feed_artifact
-      artifact_location "APP", "rpms"
+      artifact_location "APP", "package", "rpms"
     end
 
     def configuration_master_artifact
-      artifact_location "CONFIGURATION", "build"
+      artifact_location "CONFIGURATION", "package", "build"
     end
   end
 end

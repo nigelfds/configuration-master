@@ -9,7 +9,7 @@ module Go
     end
 
     def upstream_artifact
-      artifact_uri = artifact_location("SYSTEST", "build")
+      artifact_uri = artifact_location("SYSTEST", "createImage", "build")
       Net::HTTP.get_response(URI(artifact_uri)).body.chomp
     end
   end
