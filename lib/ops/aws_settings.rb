@@ -4,7 +4,7 @@ module Ops
   class AWSSettings
     attr_accessor :settings
 
-    def self.prepare
+    def self.load
       begin
         settings_file = ENV["SETTINGS_FILE"] || File.expand_path("#{File.dirname(__FILE__)}/../conf/settings.yaml")
 
