@@ -31,7 +31,6 @@ namespace :aws do
   end
 
   task :build_appserver => BUILD_DIR do
-    ec2 = AWS::EC2.new
     pipeline = Go::SystemIntegrationPipeline.new
     puppet_bootstrap = PuppetBootstrap.new(:role => "appserver",
                                            :facter_variables => "export FACTER_ARTIFACT=#{pipeline.aws_twitter_feed_artifact}\n",
