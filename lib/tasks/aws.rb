@@ -37,8 +37,8 @@ namespace :aws do
                                                 :boot_package_url => pipeline.configuration_master_artifact)
 
     stack = Ops::Stacks.new("appserver-creation-template",
-               "KeyName" => SETTINGS.aws_ssh_key_name,
-               "BootScript" => puppet_bootstrap.script)
+                            "KeyName" => SETTINGS.aws_ssh_key_name,
+                            "BootScript" => puppet_bootstrap.script)
     stack.delete!
     stack.create
   end
