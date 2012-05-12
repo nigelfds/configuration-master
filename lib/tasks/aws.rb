@@ -1,22 +1,22 @@
-require "aws_settings"
-require "stacks"
+require "uri"
+require "net/http"
+require "ops/aws_settings"
+require "ops/stacks"
+require "ops/puppet_bootstrap"
 require "go/system_integration_pipeline"
 require "go/production_deploy_pipeline"
-require "puppet_bootstrap"
-require "net/http"
-require "uri"
 
 namespace :aws do
-  SETTINGS = AWSSettings.prepare
+  SETTINGS = Ops::AWSSettings.load
 
   desc "creates the CI environment"
   task :ci_start => ["clean", "package:puppet"] do
     puppet_bootstrap = PuppetBootstrap.new(:role => "buildserver",
                                            :facter_variables => "",
                                            :boot_package_url => setup_bootstrap)
-    stacks = Stacks.new("ci-cloud-formation-template",
-                        "KeyName" => SETTINGS.aws_ssh_key_name,
-                        "BootScript" => puppet_bootstrap.script)
+    stacks = Ops::Stacks.new("ci-cloud-formation-template",
+                             "KeyName" => SETTINGS.aws_ssh_key_name,
+                             "BootScript" => puppet_bootstrap.script)
 
     puts "booting the CI environment"
     stacks.create do |stack|
@@ -27,16 +27,16 @@ namespace :aws do
 
   desc "stops the CI environment"
   task :ci_stop do
-    Stacks.new("ci-cloud-formation-template").delete!
+    Ops::Stacks.new("ci-cloud-formation-template").delete!
   end
 
   task :build_appserver do
     pipeline = Go::SystemIntegrationPipeline.new
-    puppet_bootstrap = PuppetBootstrap.new(:role => "appserver",
-                                           :facter_variables => "export FACTER_ARTIFACT=#{pipeline.aws_twitter_feed_artifact}\n",
-                                           :boot_package_url => pipeline.configuration_master_artifact)
+    puppet_bootstrap = Ops::PuppetBootstrap.new(:role => "appserver",
+                                                :facter_variables => "export FACTER_ARTIFACT=#{pipeline.aws_twitter_feed_artifact}\n",
+                                                :boot_package_url => pipeline.configuration_master_artifact)
 
-    stack = Stacks.new("appserver-creation-template",
+    stack = Ops::Stacks.new("appserver-creation-template",
                "KeyName" => SETTINGS.aws_ssh_key_name,
                "BootScript" => puppet_bootstrap.script)
     stack.delete!
@@ -44,7 +44,7 @@ namespace :aws do
   end
 
   task :create_image => BUILD_DIR do
-    stack = Stacks.new("appserver-creation-template")
+    stack = Ops::Stacks.new("appserver-creation-template")
     image_id = stack.instances.first.create_image(ENV["GO_PIPELINE_COUNTER"])
 
     File.open("#{BUILD_DIR}/image", "w") { |file| file.write(image_id) }
@@ -56,9 +56,9 @@ namespace :aws do
     image_id = Go::ProductionDeployPipeline.new.upstream_artifact
     puts "updating production configuration with image '#{image_id}'"
 
-    stack = Stacks.new("production-environment",
-                       "KeyName" => SETTINGS.aws_ssh_key_name,
-                       "ImageId" => image_id)
+    stack = Ops::Stacks.new("production-environment",
+                            "KeyName" => SETTINGS.aws_ssh_key_name,
+                            "ImageId" => image_id)
     stack.create_or_update
   end
 
