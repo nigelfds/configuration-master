@@ -11,9 +11,9 @@ namespace :aws do
 
   desc "creates the CI environment"
   task :ci_start => ["clean", "package:puppet"] do
-    puppet_bootstrap = PuppetBootstrap.new(:role => "buildserver",
-                                           :facter_variables => "",
-                                           :boot_package_url => setup_bootstrap)
+    puppet_bootstrap = Ops::PuppetBootstrap.new(:role => "buildserver",
+                                                :facter_variables => "",
+                                                :boot_package_url => setup_bootstrap)
     stacks = Ops::Stacks.new("ci-environment",
                              "KeyName" => SETTINGS.aws_ssh_key_name,
                              "BootScript" => puppet_bootstrap.script)
