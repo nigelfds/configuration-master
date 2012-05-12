@@ -14,7 +14,7 @@ module Ops
       if @options.has_key? :facter
         facter_variables = @options[:facter].map { |key, value| "export FACTER_#{key.to_s.upcase}=#{value}\n" }
         @options[:facter_variables] = facter_variables.join
-        @options.delete[:facter]
+        @options.delete :facter
       else
         @options[:facter_variables] = ""
       end
