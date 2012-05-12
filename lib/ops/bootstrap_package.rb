@@ -5,18 +5,19 @@ module Ops
     def initialize(package, bucket_name)
       @package = package
       @bucket_name = bucket_name
+      @object_name = File.basename(package)
     end
 
     def url
       s3 = AWS::S3.new
-      bucket = s3.buckets[bucket_name]
+      bucket = s3.buckets[@bucket_name]
       unless bucket.exists?
-        puts "creating S3 bucket"
-        bucket = s3.buckets.create(bucket_name)
+        puts "creating S3 bucket '#{@bucket_name}'"
+        bucket = s3.buckets.create(@bucket_name)
       end
       puts "uploading bootstrap package..."
-      bucket.objects[BOOTSTRAP_FILE].write(File.read("#{BUILD_DIR}/#{BOOTSTRAP_FILE}"))
-      bucket.objects[BOOTSTRAP_FILE].url_for(:read, :expires => 10 * 60)
+      bucket.objects[@object_name].write(File.read(@package))
+      bucket.objects[@object_name].url_for(:read, :expires => 10 * 60)
     end
   end
 end
