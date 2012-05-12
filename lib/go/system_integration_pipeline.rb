@@ -1,7 +1,7 @@
 require "go/pipeline"
 
 module Go
-  class SystemIntegrationPipeline < Go::Pipeline
+  class SystemIntegrationPipeline < Pipeline
     def initialize
       super
     end

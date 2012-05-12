@@ -3,7 +3,7 @@ require "net/http"
 require "go/pipeline"
 
 module Go
-  class ProductionDeployPipeline < Go::Pipeline
+  class ProductionDeployPipeline < Pipeline
     def initialize
       super
     end
