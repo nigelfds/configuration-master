@@ -3,7 +3,7 @@ require "ostruct"
 
 module Ops
   class PuppetBootstrap
-    BOOT_SCRIPT = "#{File.dirname(__FILE__)}/../scripts/boot.erb"
+    BOOT_SCRIPT = "#{File.dirname(__FILE__)}/../../scripts/boot.erb"
 
     def initialize(options)
       @options = options
