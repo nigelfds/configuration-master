@@ -45,7 +45,8 @@ namespace :aws do
 
   task :create_image => BUILD_DIR do
     stack = Ops::Stacks.new("appserver-validation")
-    image_id = stack.instances.first.create_image(ENV["GO_PIPELINE_COUNTER"]+"-#{rand(99)}-"+ENV["GO_REVISION"])
+    image_name = ENV["GO_PIPELINE_COUNTER"]+"-"+ENV["GO_REVISION"]+"-#{rand(999)}"
+    image_id = stack.instances.first.create_image(image_name)
 
     File.open("#{BUILD_DIR}/image", "w") { |file| file.write(image_id) }
 
