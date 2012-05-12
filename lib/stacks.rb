@@ -1,20 +1,21 @@
 require "json"
+require "base64"
 require "aws-sdk"
 
 class Stacks
   TEMPLATES_DIR = "#{File.dirname(__FILE__)}/../templates"
 
-  def initialize data
-    @data = data
-    @data[:variables] ||= {}
+  def initialize(name, variables)
+    @name = name
+    @variables = variables
   end
 
   def create(&block)
     cloud_formation = AWS::CloudFormation.new
-    stack = cloud_formation.stacks[@data[:using_template]]
+    stack = cloud_formation.stacks[@name]
     (puts("the CI environment exists already. Nothing to do") and return) if stack.exists?
 
-    stack = cloud_formation.stacks.create(@data[:using_template], template, parameters)
+    stack = cloud_formation.stacks.create(@name, template, parameters)
     sleep 1 until stack.status == "CREATE_COMPLETE"
     while ((status = stack.status) != "CREATE_COMPLETE")
         raise "error creating stack!".red if status == "ROLLBACK_COMPLETE"
@@ -25,7 +26,7 @@ class Stacks
 
   def create_or_update
     cloud_formation = AWS::CloudFormation.new
-    stack = cloud_formation.stacks[@data[:using_template]]
+    stack = cloud_formation.stacks[@name]
     if stack.exists?
       puts "updating production environment with the new version"
       begin
@@ -44,7 +45,7 @@ class Stacks
   end
 
   def delete!
-    stack = AWS::CloudFormation.new.stacks[@data[:using_template]]
+    stack = AWS::CloudFormation.new.stacks[@name]
     (puts "couldn't find stack. Nothing to do" and return) unless stack.exists?
 
     stack.delete
@@ -53,17 +54,13 @@ class Stacks
 
   private
   def template
-    JSON.parse(File.read("#{TEMPLATES_DIR}/#{@data[:using_template]}.erb"))
+    JSON.parse(File.read("#{TEMPLATES_DIR}/#{@name}.erb"))
   end
 
   def parameters
-    #todo: get rid of erb replacement
-    values = {"KeyName" => @data[:with_settings].aws_ssh_key_name}
-    values.merge! @data[:variables]
-    if values.has_key? "BootScript"
-      require "base64"
-      values["BootScript"] = Base64.encode64(values["BootScript"]).strip
+    if @variables.has_key? "BootScript"
+      @variables["BootScript"] = Base64.encode64(@variables["BootScript"]).strip
     end
-    {:parameters => values}
+    {:parameters => @variables}
   end
 end

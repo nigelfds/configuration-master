@@ -15,10 +15,11 @@ namespace :aws do
                                            :facter_variables => "",
                                            :boot_package_url => setup_bootstrap)
     puts "booting the CI environment"
-    Stacks.new(:using_template => "ci-cloud-formation-template",
-               :variables => { "BootScript" => puppet_bootstrap.script },
-               :with_settings => SETTINGS).create do |stack|
+    stacks = Stacks.new("ci-cloud-formation-template",
+                        "KeyName" => SETTINGS.aws_ssh_key_name,
+                        "BootScript" => puppet_bootstrap.script)
 
+    stacks.create do |stack|
       instance = stack.outputs.find { |output| output.key == "PublicIP" }
       puts "your CI server's address is #{instance.value}"
     end
@@ -26,7 +27,7 @@ namespace :aws do
 
   desc "stops the CI environment"
   task :ci_stop do
-    Stacks.new(:using_template => "ci-cloud-formation-template").delete!
+    Stacks.new("ci-cloud-formation-template").delete!
   end
 
   task :build_appserver => BUILD_DIR do
@@ -36,9 +37,9 @@ namespace :aws do
                                           :facter_variables => "export FACTER_ARTIFACT=#{pipeline.aws_twitter_feed_artifact}\n",
                                           :boot_package_url => pipeline.configuration_master_artifact)
 
-    stacks = Stacks.new(:using_template => "appserver-creation-template",
-                        :variables => { "BootScript" => puppet_boostrap.script },
-                        :with_settings => SETTINGS)
+    stacks = Stacks.new("appserver-creation-template",
+                        "KeyName" => SETTINGS.aws_ssh_key_name,
+                        "BootScript" => puppet_bootstrap.script)
     begin
       stacks.create do |stack|
         instance = stack.resources.find { |resource| resource.resource_type == "AWS::EC2::Instance" }
@@ -59,9 +60,9 @@ namespace :aws do
     image_id = ProductionDeployPipeline.new.upstream_artifact
     puts "updating production configuration with image '#{image_id}'"
 
-    stack = Stacks.new(:using_template => "production-environment",
-                       :variables => {"ImageId" => image_id},
-                       :with_settings => SETTINGS)
+    stack = Stacks.new("production-environment",
+                       "KeyName" => SETTINGS.aws_ssh_key_name,
+                       "ImageId" => image_id)
     stack.create_or_update
   end
 
