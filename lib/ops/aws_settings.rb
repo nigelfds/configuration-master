@@ -6,7 +6,7 @@ module Ops
 
     def self.load
       begin
-        settings_file = ENV["SETTINGS_FILE"] || File.expand_path("#{File.dirname(__FILE__)}/../conf/settings.yaml")
+        settings_file = ENV["SETTINGS_FILE"] || File.expand_path("#{File.dirname(__FILE__)}/../../conf/settings.yaml")
 
         settings = AWSSettings.new
         settings.settings = YAML::parse(open(settings_file)).transform
