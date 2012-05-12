@@ -56,9 +56,9 @@ namespace :aws do
   end
 
   task :deploy_to_production do
-    pipeline = ProductionDeployPipeline.new
-    image_id = Net::HTTP.get_response(URI(pipeline.upstream_artifact)).body.chomp
+    image_id = ProductionDeployPipeline.new.upstream_artifact
     puts "updating production configuration with image '#{image_id}'"
+
     stack = Stacks.new(:using_template => "production-environment",
                        :variables => {"ImageId" => image_id},
                        :with_settings => SETTINGS)
@@ -66,13 +66,13 @@ namespace :aws do
   end
 
   task :roll_new_version do
-    pipeline = ProductionDeployPipeline.new
-    image_id = Net::HTTP.get_response(URI(pipeline.upstream_artifact)).body.chomp
+    image_id = ProductionDeployPipeline.new.upstream_artifact
     puts "rolling image #{image_id} into production"
+
     auto_scaling = AWS::AutoScaling.new
-    instances = auto_scaling.instances
-    instances_to_retire = instances.select { |i| not i.ec2_instance.image_id.eql?(image_id) }
+    instances_to_retire = auto_scaling.instances.select { |i| not i.ec2_instance.image_id.eql?(image_id) }
     puts "#{instances_to_retire.size} instances have to be updated with the new configuration"
+
     instances_to_retire.each do |instance|
       puts "terminating instance '#{instance.instance_id}'"
       instance.terminate(false)

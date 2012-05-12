@@ -8,7 +8,8 @@ class ProductionDeployPipeline
   end
 
   def upstream_artifact
-    fetch_artifact "SYSTEST", "build"
+    artifact_uri = fetch_artifact("SYSTEST", "build")
+    Net::HTTP.get_response(URI(pipeline.upstream_artifact)).body.chomp
   end
 
   def fetch_artifact(pipeline_name, artifact_dir)
