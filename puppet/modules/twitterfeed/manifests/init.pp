@@ -1,4 +1,4 @@
-class awstwitterfeed {
+class twitterfeed {
   package { "aws-twitter-feed":
     provider => "rpm",
     source   => "${artifact}",

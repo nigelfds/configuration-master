@@ -1,5 +1,5 @@
 class appserver {
-  include awstwitterfeed
+  include twitterfeed
   include newrelic
 }
 include appserver
