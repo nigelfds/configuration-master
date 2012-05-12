@@ -1,6 +1,6 @@
 {
   "AWSTemplateFormatVersion" : "2010-09-09",
-  "Description" : "Creates CI environment",
+  "Description" : "Creates a single application server instance for validation",
 
   "Parameters" : {
     "KeyName" : {

@@ -1,6 +1,6 @@
 {
 	"AWSTemplateFormatVersion":"2010-09-09",
-	"Description":"AWS Twitter Feed production environment",
+	"Description":"Twitter Feed production environment",
 	"Parameters":{
 		"WebServerPort":{
 			"Description":"Port that the application will run on",
