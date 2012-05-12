@@ -14,7 +14,7 @@ namespace :aws do
     puppet_bootstrap = PuppetBootstrap.new(:role => "buildserver",
                                            :facter_variables => "",
                                            :boot_package_url => setup_bootstrap)
-    stacks = Ops::Stacks.new("ci-cloud-formation-template",
+    stacks = Ops::Stacks.new("ci-environment",
                              "KeyName" => SETTINGS.aws_ssh_key_name,
                              "BootScript" => puppet_bootstrap.script)
 
@@ -27,7 +27,7 @@ namespace :aws do
 
   desc "stops the CI environment"
   task :ci_stop do
-    Ops::Stacks.new("ci-cloud-formation-template").delete!
+    Ops::Stacks.new("ci-environment").delete!
   end
 
   task :build_appserver do
@@ -36,7 +36,7 @@ namespace :aws do
                                                 :facter_variables => "export FACTER_ARTIFACT=#{pipeline.aws_twitter_feed_artifact}\n",
                                                 :boot_package_url => pipeline.configuration_master_artifact)
 
-    stack = Ops::Stacks.new("appserver-creation-template",
+    stack = Ops::Stacks.new("appserver-validation",
                             "KeyName" => SETTINGS.aws_ssh_key_name,
                             "BootScript" => puppet_bootstrap.script)
     stack.delete!
@@ -44,7 +44,7 @@ namespace :aws do
   end
 
   task :create_image => BUILD_DIR do
-    stack = Ops::Stacks.new("appserver-creation-template")
+    stack = Ops::Stacks.new("appserver-validation")
     image_id = stack.instances.first.create_image(ENV["GO_PIPELINE_COUNTER"])
 
     File.open("#{BUILD_DIR}/image", "w") { |file| file.write(image_id) }
@@ -80,15 +80,6 @@ namespace :aws do
       end
     end
     puts "all instances updated successfuly"
-  end
-
-  def test_application(host)
-    puts "testing... #{host}"
-    (1..10).each do |n|
-      puts n
-      sleep 1
-    end
-    puts "all good!"
   end
 
   def setup_bootstrap

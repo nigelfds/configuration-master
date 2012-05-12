@@ -5,7 +5,7 @@ require "ops/instance"
 
 module Ops
   class Stacks
-    TEMPLATES_DIR = "#{File.dirname(__FILE__)}/../templates"
+    TEMPLATES_DIR = "#{File.dirname(__FILE__)}/../../templates"
 
     def initialize(name, variables = {})
       @name = name
@@ -63,7 +63,7 @@ module Ops
 
     private
     def template
-      JSON.parse(File.read("#{TEMPLATES_DIR}/#{@name}.erb"))
+      JSON.parse(File.read("#{TEMPLATES_DIR}/#{@name}.json"))
     end
 
     def parameters
