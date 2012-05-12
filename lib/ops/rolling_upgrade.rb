@@ -8,7 +8,7 @@ module Ops
 
     def run
       auto_scaling = AWS::AutoScaling.new
-      instances_to_retire = auto_scaling.instances.select { |i| not i.ec2_instance.image_id.eql?(image_id) }
+      instances_to_retire = auto_scaling.instances.select { |i| not i.ec2_instance.image_id.eql?(@image_id) }
       puts "#{instances_to_retire.size} instances have to be updated with the new configuration"
 
       instances_to_retire.each do |instance|
