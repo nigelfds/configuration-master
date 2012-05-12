@@ -3,6 +3,8 @@ require "net/http"
 require "lib/ops/aws_settings"
 require "lib/ops/stacks"
 require "lib/ops/puppet_bootstrap"
+require "lib/ops/rolling_upgrade"
+require "lib/ops/bootstrap_package"
 require "lib/go/system_integration_pipeline"
 require "lib/go/production_deploy_pipeline"
 
@@ -67,32 +69,14 @@ namespace :aws do
     image_id = Go::ProductionDeployPipeline.new.upstream_artifact
     puts "rolling image #{image_id} into production"
 
-    auto_scaling = AWS::AutoScaling.new
-    instances_to_retire = auto_scaling.instances.select { |i| not i.ec2_instance.image_id.eql?(image_id) }
-    puts "#{instances_to_retire.size} instances have to be updated with the new configuration"
+    upgrade = Ops::RollingUpgrade.new(image_id)
+    upgrade.run
 
-    instances_to_retire.each do |instance|
-      puts "terminating instance '#{instance.instance_id}'"
-      instance.terminate(false)
-      sleep 10
-      while true
-        break if auto_scaling.instances.select { |i| i.ec2_instance.status.eql? :running }.count == 2
-        sleep 5
-      end
-    end
-    puts "all instances updated successfuly"
+    puts "new version updated successfuly"
   end
 
   def setup_bootstrap
-    s3 = AWS::S3.new
     bucket_name = "aws-twitter-stream-bootstrap-bucket-#{SETTINGS.aws_ssh_key_name}"
-    bucket = s3.buckets[bucket_name]
-    unless bucket.exists?
-      puts "creating S3 bucket".cyan
-      bucket = s3.buckets.create(bucket_name)
-    end
-    puts "uploading bootstrap package...".cyan
-    bucket.objects[BOOTSTRAP_FILE].write(File.read("#{BUILD_DIR}/#{BOOTSTRAP_FILE}"))
-    bucket.objects[BOOTSTRAP_FILE].url_for(:read, :expires => 10 * 60)
+    Ops::BootstrapPackage.new("#{BUILD_DIR}/#{BOOTSTRAP_FILE}", bucket_name).url
   end
 end

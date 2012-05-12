@@ -15,14 +15,14 @@ module Ops
     def create
       cloud_formation = AWS::CloudFormation.new
       stack = cloud_formation.stacks[@name]
-      (puts("the CI environment exists already. Nothing to do") and return) if stack.exists?
+      (puts("environment already exists") and return) if stack.exists?
 
       stack = cloud_formation.stacks.create(@name, template, parameters)
       while ((status = stack.status) != "CREATE_COMPLETE")
         raise "error creating stack!" if status == "ROLLBACK_COMPLETE"
         sleep 5
       end
-      puts "the CI environment has been provisioned successfully".white
+      puts "environment successfully provisioned"
       yield stack if block_given?
     end
 
@@ -30,11 +30,11 @@ module Ops
       cloud_formation = AWS::CloudFormation.new
       stack = cloud_formation.stacks[@name]
       if stack.exists?
-        puts "updating production environment with the new version"
+        puts "updating environment"
         begin
           stack.update :template => template, :parameters => parameters[:parameters]
         rescue Exception => e
-          if e.message.eql? "No updates are to be performed."
+          if e.message.eql? "no updates are to be performed"
             puts e.message
             return
           else
@@ -48,11 +48,11 @@ module Ops
 
     def delete!
       stack = AWS::CloudFormation.new.stacks[@name]
-      (puts "couldn't find stack. Nothing to do" and return) unless stack.exists?
+      (puts "couldn't find stack" and return) unless stack.exists?
 
       stack.delete
       sleep 30 while stack.exists?
-      puts "shutdown command successful"
+      puts "environment delete successful"
     end
 
     def instances
