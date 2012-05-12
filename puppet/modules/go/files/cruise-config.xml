@@ -12,7 +12,7 @@
               <exec command="./go" args="package" />
             </tasks>
             <artifacts>
-              <artifact src="aws-twitter-feed-0.0.1.noarch.rpm" dest="rpms" />
+              <artifact src="aws-twitter-feed-*.rpm" dest="rpms" />
             </artifacts>
           </job>
         </jobs>
