@@ -7,6 +7,17 @@ module Ops
 
     def initialize(options)
       @options = options
+      setup_facter_variables
+    end
+
+    def setup_facter_variables
+      if @options.has_key? :facter
+        facter_variables = @options[:facter].map { |key, value| "export FACTER_#{key.to_s.upcase}=#{value}\n" }
+        @options[:facter_variables] = facter_variables.join
+        @options.delete[:facter]
+      else
+        @options[:facter_variables] = ""
+      end
     end
 
     def script

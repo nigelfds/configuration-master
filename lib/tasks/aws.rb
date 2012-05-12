@@ -14,7 +14,6 @@ namespace :aws do
   desc "creates the CI environment"
   task :ci_start => ["clean", "package:puppet"] do
     puppet_bootstrap = Ops::PuppetBootstrap.new(:role => "buildserver",
-                                                :facter_variables => "",
                                                 :boot_package_url => setup_bootstrap)
     stacks = Ops::Stacks.new("ci-environment",
                              "KeyName" => SETTINGS.aws_ssh_key_name,
@@ -35,7 +34,7 @@ namespace :aws do
   task :build_appserver do
     pipeline = Go::SystemIntegrationPipeline.new
     puppet_bootstrap = Ops::PuppetBootstrap.new(:role => "appserver",
-                                                :facter_variables => "export FACTER_ARTIFACT=#{pipeline.aws_twitter_feed_artifact}\n",
+                                                :facter => { :artifact => pipeline.aws_twitter_feed_artifact },
                                                 :boot_package_url => pipeline.configuration_master_artifact)
 
     stack = Ops::Stacks.new("appserver-validation",
