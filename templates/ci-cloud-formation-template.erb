@@ -6,7 +6,11 @@
     "KeyName" : {
       "Description" : "Name of and existing EC2 KeyPair to enable SSH access to the instance",
       "Type" : "String"
-     }
+    },
+    "BootScript" : {
+      "Description" : "Script used to boot and initialise the instance",
+      "Type" : "String"
+    }
   },
 
   "Mappings" : {
@@ -27,7 +31,7 @@
         "SecurityGroups" : [ { "Ref" : "InstanceSecurityGroup" } ],
         "KeyName" : { "Ref" : "KeyName" },
         "ImageId" : { "Fn::FindInMap" : [ "RegionMap", { "Ref" : "AWS::Region" }, "AMI" ]},
-        "UserData": { "Fn::Base64": { "Fn::Join": [ "", [<%= boot_script.to_json  %>] ] } }
+        "UserData": { "Ref": "BootScript" }
       }
     },
 

@@ -1,5 +1,4 @@
 require 'aws_settings'
-require 'cloud_formation_template'
 require 'stacks'
 require "system_integration_pipeline"
 require "production_deploy_pipeline"
@@ -8,7 +7,6 @@ require "uri"
 
 namespace :aws do
   SETTINGS = AWSSettings.prepare
-  STACK_NAME = "twitter-stream-ci"
   SCRIPTS_DIR = "#{File.dirname(__FILE__)}/../../scripts"
 
   desc "creates the CI environment"
@@ -17,10 +15,8 @@ namespace :aws do
                                   :role => "buildserver",
                                   :facter_variables => "",
                                   :boot_package_url => setup_bootstrap)
-    template = CloudFormationTemplate.new("ci-cloud-formation-template",
-                                          :boot_script => buildserver_boot_script)
-    Stacks.new(:named => STACK_NAME,
-               :using_template => template.as_json_obj,
+    Stacks.new(:using_template => "ci-cloud-formation-template",
+               :variables => { "BootScript" => buildserver_boot_script },
                :with_settings => SETTINGS).create do |stack|
 
       instance = stack.outputs.find { |output| output.key == "PublicIP" }
@@ -30,7 +26,7 @@ namespace :aws do
 
   desc "stops the CI environment"
   task :ci_stop do
-    Stacks.new(:named => STACK_NAME).delete!
+    Stacks.new(:using_template => "ci-cloud-formation-template").delete!
   end
 
   task :build_appserver => BUILD_DIR do
@@ -41,9 +37,8 @@ namespace :aws do
                       :facter_variables => "export FACTER_ARTIFACT=#{pipeline.aws_twitter_feed_artifact}\n",
                       :boot_package_url => pipeline.configuration_master_artifact)
 
-    template = CloudFormationTemplate.new("appserver-creation-template", :boot_script => boot_script)
-    stacks = Stacks.new(:named => "appserver-creation",
-                        :using_template => template.as_json_obj,
+    stacks = Stacks.new(:using_template => "appserver-creation-template",
+                        :variables => { "BootScript" => boot_script },
                         :with_settings => SETTINGS)
     begin
       stacks.create do |stack|
@@ -65,9 +60,7 @@ namespace :aws do
     pipeline = ProductionDeployPipeline.new
     image_id = Net::HTTP.get_response(URI(pipeline.upstream_artifact)).body.chomp
     puts "updating production configuration with image '#{image_id}'"
-    template = CloudFormationTemplate.new("production-environment", {})
-    stack = Stacks.new(:named => "production-environment",
-                       :using_template => template.as_json_obj,
+    stack = Stacks.new(:using_template => "production-environment",
                        :variables => {"ImageId" => image_id},
                        :with_settings => SETTINGS)
     stack.create_or_update
@@ -104,7 +97,7 @@ namespace :aws do
 
   def setup_bootstrap
     s3 = AWS::S3.new
-    bucket_name = "#{STACK_NAME}-bootstrap-bucket-#{AWSSettings.prepare.aws_ssh_key_name}"
+    bucket_name = "aws-twitter-stream-bootstrap-bucket-#{AWSSettings.prepare.aws_ssh_key_name}"
     bucket = s3.buckets[bucket_name]
     unless bucket.exists?
       puts "creating S3 bucket".cyan

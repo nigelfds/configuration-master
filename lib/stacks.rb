@@ -1,6 +1,9 @@
+require "json"
 require "aws-sdk"
 
 class Stacks
+  TEMPLATES_DIR = "#{File.dirname(__FILE__)}/../templates"
+
   def initialize data
     @data = data
     @data[:variables] ||= {}
@@ -8,11 +11,10 @@ class Stacks
 
   def create(&block)
     cloud_formation = AWS::CloudFormation.new
-    stack = cloud_formation.stacks[name]
+    stack = cloud_formation.stacks[@data[:using_template]]
     (puts("the CI environment exists already. Nothing to do") and return) if stack.exists?
 
-    puts "creating aws stack, this might take a while... ".white
-    stack = cloud_formation.stacks.create(name, template, parameters)
+    stack = cloud_formation.stacks.create(@data[:using_template], template, parameters)
     sleep 1 until stack.status == "CREATE_COMPLETE"
     while ((status = stack.status) != "CREATE_COMPLETE")
         raise "error creating stack!".red if status == "ROLLBACK_COMPLETE"
@@ -23,7 +25,7 @@ class Stacks
 
   def create_or_update
     cloud_formation = AWS::CloudFormation.new
-    stack = cloud_formation.stacks[name]
+    stack = cloud_formation.stacks[@data[:using_template]]
     if stack.exists?
       puts "updating production environment with the new version"
       begin
@@ -42,26 +44,26 @@ class Stacks
   end
 
   def delete!
-    stack = AWS::CloudFormation.new.stacks[name]
+    stack = AWS::CloudFormation.new.stacks[@data[:using_template]]
     (puts "couldn't find stack. Nothing to do" and return) unless stack.exists?
 
     stack.delete
-    puts "shutdown command successful".green
+    puts "shutdown command successful"
   end
 
   private
-  def name
-    @data[:named]
-  end
-
   def template
-    @data[:using_template]
+    JSON.parse(File.read("#{TEMPLATES_DIR}/#{@data[:using_template]}.erb"))
   end
 
   def parameters
     #todo: get rid of erb replacement
     values = {"KeyName" => @data[:with_settings].aws_ssh_key_name}
     values.merge! @data[:variables]
+    if values.has_key? "BootScript"
+      require "base64"
+      values["BootScript"] = Base64.encode64(values["BootScript"]).strip
+    end
     {:parameters => values}
   end
 end
