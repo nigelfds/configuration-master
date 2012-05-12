@@ -18,7 +18,7 @@ class Stacks
     stack = cloud_formation.stacks.create(@name, template, parameters)
     sleep 1 until stack.status == "CREATE_COMPLETE"
     while ((status = stack.status) != "CREATE_COMPLETE")
-        raise "error creating stack!".red if status == "ROLLBACK_COMPLETE"
+      raise "error creating stack!".red if status == "ROLLBACK_COMPLETE"
     end
     puts "the CI environment has been provisioned successfully".white
     yield stack if block_given?
@@ -50,6 +50,12 @@ class Stacks
 
     stack.delete
     puts "shutdown command successful"
+  end
+
+  def instances
+    stack = AWS::CloudFormation.new.stacks[@name]
+    stack_instances = stack.resources.select { |resource| resource.resource_type == "AWS::EC2::Instance" }
+    stack_instances.map { |stack_instance| Ops::Instance.new(stack_instance.physical_resource_id) }
   end
 
   private

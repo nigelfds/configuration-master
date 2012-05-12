@@ -37,23 +37,18 @@ namespace :aws do
                                            :facter_variables => "export FACTER_ARTIFACT=#{pipeline.aws_twitter_feed_artifact}\n",
                                            :boot_package_url => pipeline.configuration_master_artifact)
 
-    stacks = Stacks.new("appserver-creation-template",
-                        "KeyName" => SETTINGS.aws_ssh_key_name,
-                        "BootScript" => puppet_bootstrap.script)
-    begin
-      stacks.create do |stack|
-        instance = stack.resources.find { |resource| resource.resource_type == "AWS::EC2::Instance" }
+    Stacks.new("appserver-creation-template",
+               "KeyName" => SETTINGS.aws_ssh_key_name,
+               "BootScript" => puppet_bootstrap.script).create
+  end
 
-        test_application ec2.instances[instance.physical_resource_id].public_dns_name
+  task :create_image do
+    stack = Stacks.new("appserver-creation-template")
+    image_id = stack.instances.first.create_image(ENV["GO_PIPELINE_COUNTER"])
 
-        image = ec2.images.create(:instance_id => instance.physical_resource_id,
-                                  :name => "aws-twitter-feed-#{ENV['GO_PIPELINE_COUNTER']}")
-        sleep 1 until image.state.to_s.eql? "available"
-        File.open("#{BUILD_DIR}/image", "w") { |file| file.write(image.id) }
-      end
-    ensure
-      stacks.delete!
-    end
+    File.open("#{BUILD_DIR}/image", "w") { |file| file.write(image_id) }
+
+    stack.delete!
   end
 
   task :deploy_to_production do
