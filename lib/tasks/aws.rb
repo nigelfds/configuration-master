@@ -30,7 +30,7 @@ namespace :aws do
     Stacks.new("ci-cloud-formation-template").delete!
   end
 
-  task :build_appserver => BUILD_DIR do
+  task :build_appserver do
     pipeline = Go::SystemIntegrationPipeline.new
     puppet_bootstrap = PuppetBootstrap.new(:role => "appserver",
                                            :facter_variables => "export FACTER_ARTIFACT=#{pipeline.aws_twitter_feed_artifact}\n",
@@ -41,7 +41,7 @@ namespace :aws do
                "BootScript" => puppet_bootstrap.script).create
   end
 
-  task :create_image do
+  task :create_image => BUILD_DIR do
     stack = Stacks.new("appserver-creation-template")
     image_id = stack.instances.first.create_image(ENV["GO_PIPELINE_COUNTER"])
 

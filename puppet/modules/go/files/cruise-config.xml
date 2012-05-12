@@ -51,11 +51,20 @@
         <pipeline pipelineName="ConfigurationMasterProject" stageName="CommitBuild" materialName="upstreamArtifactConfiguration" />
         <git url="https://github.com/nigelfds/configuration-master" />
       </materials>
-      <stage name="CommitBuild">
+      <stage name="BuildAppServer">
         <jobs>
-          <job name="package">
+          <job name="BuildAppServer">
             <tasks>
               <exec command="./go" args="aws:build_appserver" />
+            </tasks>
+          </job>
+        </jobs>
+      </stage>
+      <stage name="CreateImage">
+        <jobs>
+          <job name="CreateImage">
+            <tasks>
+              <exec command="./go" args="aws:create_image" />
             </tasks>
             <artifacts>
               <artifact src="build/image" dest="build" />
@@ -71,7 +80,7 @@
         </variable>
       </environmentvariables>
       <materials>
-        <pipeline pipelineName="SystemIntegration" stageName="CommitBuild" materialName="upstreamArtifactSystest" />
+        <pipeline pipelineName="SystemIntegration" stageName="CreateImage" materialName="upstreamArtifactSystest" />
         <git url="https://github.com/nigelfds/configuration-master" materialName="configurationMaster" />
       </materials>
       <stage name="CommitBuild">
