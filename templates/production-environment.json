@@ -46,7 +46,7 @@
         },
 				"SecurityGroups":[
 					{
-						"Ref":"InstanceSecurityGroup"
+						"Ref":"ProductionSecurityGroup"
 					}
 				],
 				"InstanceType":"m1.medium"
@@ -87,7 +87,7 @@
 				}
 			}
 		},
-		"InstanceSecurityGroup":{
+		"ProductionSecurityGroup":{
 			"Type":"AWS::EC2::SecurityGroup",
 			"Properties":{
 				"GroupDescription":"Enable SSH access and HTTP access on the configured port",
