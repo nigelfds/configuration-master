@@ -31,13 +31,17 @@ module Ops
     end
 
     def accepting_requests?(ip)
-      Timeout::timeout(2) do
-        begin
-          TCPSocket.new(ip, 8080).close
-          true
-        rescue Errno::ECONNREFUSED, Errno::EHOSTUNREACH
-          false
+      begin
+        Timeout::timeout(2) do
+          begin
+            TCPSocket.new(ip, 8080).close
+            true
+          rescue Errno::ECONNREFUSED, Errno::EHOSTUNREACH
+            false
+          end
         end
+      rescue Timeout::Error
+        false
       end
     end
   end
