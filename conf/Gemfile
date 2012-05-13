@@ -5,7 +5,4 @@ gem "aws-sdk"
 gem "colorize"
 gem "rspec"
 gem "jruby-openssl", :platform => "jruby"
-
-group :development do 
-  gem "vagrant", "1.0.1"
-end
+gem "puppet"
