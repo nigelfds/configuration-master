@@ -9,8 +9,11 @@
         <jobs>
           <job name="Specs">
             <tasks>
-              <exec command="./go" args="spec" />
+              <exec command="./go" args="spec format=junit" />
             </tasks>
+            <artifacts>
+              <test src="build-output/test-reports" />
+            </artifacts>
           </job>
         </jobs>
       </stage>
