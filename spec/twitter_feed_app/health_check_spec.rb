@@ -17,7 +17,7 @@ describe "Twitter Feed App Health Check" do
   end
 
   def get_twitter_statuses(url)
-    retries = 5
+    retries = 20
     html = ""
     while retries > 0 && html.empty?
       begin
@@ -30,7 +30,7 @@ describe "Twitter Feed App Health Check" do
       rescue => e
         $stderr.puts "Failed to get Twitter statuses from #{url}: #{e.message}"
         $stderr.puts "Retrying..."
-        sleep 10
+        sleep 15
       end
       retries -= 1
     end
