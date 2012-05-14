@@ -81,6 +81,15 @@
           </job>
         </jobs>
       </stage>
+      <stage name="VerifyAppHealth">
+        <jobs>
+          <job name="VerifyAppHealth">
+            <tasks>
+              <exec command="./go" args="test:twitter_feed:health_check" />
+            </tasks>
+          </job>
+        </jobs>
+      </stage>
       <stage name="CreateImage">
         <jobs>
           <job name="CreateImage">
