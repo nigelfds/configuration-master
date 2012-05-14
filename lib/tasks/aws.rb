@@ -45,7 +45,7 @@ namespace :aws do
     stack.delete!
     stack.create
 
-    hostname = stack.instances.first.instance.url
+    hostname = stack.instances.first.url
     File.open("#{BUILD_DIR}/app-url", "w") { |file| file.write(hostname) }
   end
 
