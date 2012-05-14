@@ -8,8 +8,7 @@ namespace :test do
 
     require 'rspec/core/rake_task'
 
-    desc "Verify twitter feed app is healthy"
-      RSpec::Core::RakeTask.new(:health_check) do |t|
+    RSpec::Core::RakeTask.new(:health_check) do |t|
       t.pattern = "spec/twitter_feed_app/**/*_spec.rb"
     end
   end
