@@ -18,8 +18,8 @@ describe "Twitter Feed App Health Check" do
 
   def get_twitter_statuses(url)
     retries = 20
-    html = ""
-    while retries > 0 && html.empty?
+    html = nil
+    while retries > 0 && html.nil?
       begin
         response = Excon.get(url)
         if response.status == 200
@@ -34,6 +34,7 @@ describe "Twitter Feed App Health Check" do
       end
       retries -= 1
     end
+    raise "Unable to retrieve any Tweets from #{url}" if html.nil?
     html
   end
 end
