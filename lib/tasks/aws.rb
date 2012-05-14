@@ -42,11 +42,11 @@ namespace :aws do
     stack = Ops::Stacks.new("appserver-validation",
                             "KeyName" => SETTINGS.aws_ssh_key_name,
                             "BootScript" => puppet_bootstrap.script)
-    hostname = stack.instances.first.instance.url
-    File.open("#{BUILD_DIR}/app-url", "w") { |file| file.write(hostname) }
-
     stack.delete!
     stack.create
+
+    hostname = stack.instances.first.instance.url
+    File.open("#{BUILD_DIR}/app-url", "w") { |file| file.write(hostname) }
   end
 
   desc "creates an image of an existing appserver instance"
