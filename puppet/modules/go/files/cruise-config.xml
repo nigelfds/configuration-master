@@ -5,6 +5,15 @@
       <materials>
         <git url="https://github.com/nigelfds/aws-twitter-feed" />
       </materials>
+      <stage name="Specs">
+        <jobs>
+          <job name="Specs">
+            <tasks>
+              <exec command="./go" args="spec" />
+            </tasks>
+          </job>
+        </jobs>
+      </stage>
       <stage name="Package">
         <jobs>
           <job name="Package">
