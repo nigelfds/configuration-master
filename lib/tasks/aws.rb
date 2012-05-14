@@ -33,7 +33,7 @@ namespace :aws do
   end
 
   desc "creates a new instance of the application server"
-  task :build_appserver do
+  task :build_appserver => BUILD_DIR do
     pipeline = Go::SystemIntegrationPipeline.new
     puppet_bootstrap = Ops::PuppetBootstrap.new(:role => "appserver",
                                                 :facter => { :artifact => pipeline.aws_twitter_feed_artifact },
@@ -42,6 +42,9 @@ namespace :aws do
     stack = Ops::Stacks.new("appserver-validation",
                             "KeyName" => SETTINGS.aws_ssh_key_name,
                             "BootScript" => puppet_bootstrap.script)
+    hostname = stack.instances.first.ec2_instance.public_dns_name
+    File.open("#{BUILD_DIR}/app-url", "w") { |file| file.write(hostname) }
+
     stack.delete!
     stack.create
   end
