@@ -9,10 +9,9 @@ if [ ! -d "$HOME/.rvm" ]; then
   curl -L get.rvm.io | bash -s stable
 fi
 
-# load RVM and project config
-[[ -s "$HOME/.rvm/scripts/rvm" ]] && . "$HOME/.rvm/scripts/rvm"
-rvm rvmrc trust . > /dev/null
-source .rvmrc > /dev/null
+source ~/.rvm/scripts/'rvm'
+rvm rvmrc trust
+rvm rvmrc load .
 
 # install gems using bundler
 gem list | grep bundler  || gem install bundler --version 1.0.21 --no-rdoc --no-ri
